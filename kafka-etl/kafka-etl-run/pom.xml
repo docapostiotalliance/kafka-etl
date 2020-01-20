@@ -7,8 +7,8 @@
     <groupId>org.kafka.etl</groupId>
     <version>1.0.0-SNAPSHOT</version>
   </parent>
-  <artifactId>kafka-etl-core</artifactId>
-  <name>Kafka ETL CORE</name>
+  <artifactId>kafka-etl-run</artifactId>
+  <name>Kafka ETL RUN</name>
 
   <dependencyManagement>
     <dependencies>
@@ -26,6 +26,26 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.kafka.etl</groupId>
+      <artifactId>kafka-etl-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.kafka</groupId>
+      <artifactId>kafka_${kafka.scala.version}</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.google.inject</groupId>
+      <artifactId>guice</artifactId>
     </dependency>
   </dependencies>
 </project>

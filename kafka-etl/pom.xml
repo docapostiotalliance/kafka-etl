@@ -20,5 +20,6 @@
   <modules>
     <module>kafka-etl-bom</module>
     <module>kafka-etl-core</module>
+    <module>kafka-etl-run</module>
   </modules>
 </project>
