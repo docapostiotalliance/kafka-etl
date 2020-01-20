@@ -9,6 +9,9 @@
   <packaging>pom</packaging>
 
   <properties>
+    <java.version>1.8</java.version>
+    <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
+    <maven-compiler-plugin.version>3.1</maven-compiler-plugin.version>
     <slf4j.version>1.7.21</slf4j.version>
     <commons-lang3.version>3.3.2</commons-lang3.version>
     <kafka.scala.version>2.11</kafka.scala.version>
@@ -22,4 +25,23 @@
     <module>kafka-etl-core</module>
     <module>kafka-etl-run</module>
   </modules>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>${maven-compiler-plugin.version}</version>
+          <configuration>
+            <source>${java.version}</source>
+            <target>${java.version}</target>
+            <compilerArguments>
+              <endorseddirs>${endorsed.dir}</endorseddirs>
+            </compilerArguments>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
 </project>
