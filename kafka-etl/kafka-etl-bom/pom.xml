@@ -28,6 +28,16 @@
         <artifactId>kafka_${kafka.scala.version}</artifactId>
         <version>${kafka.version}</version>
       </dependency>
+      <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-core</artifactId>
+      <version>${vertx.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.inject</groupId>
+      <artifactId>guice</artifactId>
+      <version>${guice.version}</version>
+    </dependency>
     </dependencies>
   </dependencyManagement>
 </project>

@@ -13,6 +13,8 @@
     <commons-lang3.version>3.3.2</commons-lang3.version>
     <kafka.scala.version>2.11</kafka.scala.version>
     <kafka.version>0.10.0.0</kafka.version>
+    <vertx.version>3.4.1</vertx.version>
+    <guice.version>4.1.0</guice.version>
   </properties>
 
   <modules>
