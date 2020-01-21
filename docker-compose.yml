@@ -17,7 +17,7 @@ services:
       KAFKA_ADVERTISED_HOST_NAME: etl_kafka
       KAFKA_ADVERTISED_PORT: 9092
       KAFKA_ZOOKEEPER_CONNECT: "etl_zoo:2181"
-      KAFKA_CREATE_TOPICS: "IN:1:1,OUT:1:1"
+      KAFKA_CREATE_TOPICS: "IN:10:1,OUT:10:1"
     depends_on:
       - etl_zoo
   etl_run:
