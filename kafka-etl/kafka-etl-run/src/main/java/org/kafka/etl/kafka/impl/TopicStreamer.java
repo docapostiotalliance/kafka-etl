@@ -5,9 +5,9 @@ import org.apache.kafka.clients.consumer.CommitFailedException;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.common.TopicPartition;
-import org.apache.kafka.common.errors.WakeupException;
 import org.kafka.etl.kafka.IAdditionalConfig;
 import org.kafka.etl.kafka.IConsumerManager;
 import org.kafka.etl.kafka.IPartitionKeyCalculator;
@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.PostConstruct;
 import javax.inject.Named;
 
+import java.util.Collections;
 import java.util.List;
 
 import static org.kafka.etl.ioc.BindedConstants.GROUP_ID;
@@ -131,5 +132,7 @@ public class TopicStreamer implements ITopicStreamer {
         transformed,
         inputTopic,
         callback);
+    consumer.commitSync(Collections.singletonMap(eventKafkaInfos.getTopicPartition(),
+        new OffsetAndMetadata(eventKafkaInfos.getOffset() + 1)));
   }
 }
