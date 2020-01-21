@@ -2,25 +2,33 @@ package org.kafka.etl.ioc;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Optional;
+
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import org.kafka.etl.kafka.IAdditionalConfig;
 import org.kafka.etl.kafka.IConsumerManager;
+import org.kafka.etl.kafka.IDeserializer;
 import org.kafka.etl.kafka.IPartitionKeyCalculator;
 import org.kafka.etl.kafka.IProducerCallback;
 import org.kafka.etl.kafka.IProducerManager;
 import org.kafka.etl.kafka.ITopicStreamer;
+import org.kafka.etl.kafka.impl.AvroToJsonDeserializer;
 import org.kafka.etl.kafka.impl.ConsumerManager;
 import org.kafka.etl.kafka.impl.DefaultAdditionalConfig;
+import org.kafka.etl.kafka.impl.DefaultDeserializer;
 import org.kafka.etl.kafka.impl.DefaultPartitionKeyCalculator;
 import org.kafka.etl.kafka.impl.DefaultProducerCallback;
 import org.kafka.etl.kafka.impl.ProducerManager;
 import org.kafka.etl.kafka.impl.TopicStreamer;
 import org.kafka.etl.transform.ITransform;
+import org.kafka.etl.utils.FileHelper;
 
 import static java.util.Objects.requireNonNull;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.kafka.etl.ioc.BindedConstants.CONSUMER_RECORD_SIZE;
 import static org.kafka.etl.ioc.BindedConstants.GROUP_ID;
 import static org.kafka.etl.ioc.BindedConstants.INPUT_TOPIC;
@@ -43,6 +51,7 @@ public class EtlContext extends AbstractModule {
   private static final String KEY_POLL_TIMEOUT = "poll.timeout";
   private static final String KEY_CONSUMER_RECORD_SIZE = "consumer.record.size";
   private static final String KEY_PRODUCER_RECORD_SIZE = "producer.record.size";
+  private static final String KEY_JSON_AVRO_SCHEMA = "avro.json.schema.path";
 
   private static final String MSG_ERR_BAD_CLASS_TPL = "%s is not an instance of ITransform";
   private static final String MSG_ERR_INSTANCIATE_TRANSFORM_CLASS_TPL =
@@ -62,11 +71,14 @@ public class EtlContext extends AbstractModule {
         additionalConfig.producerAdditionalConfig());
   }
 
-  private IConsumerManager createConsumerManager() {
+  private IConsumerManager createConsumerManager(IDeserializer keyDeserializer,
+                                                 IDeserializer valueDeserializer) {
     return new ConsumerManager(properties.getString(KEY_KAFKA_CONSUMER_HOST),
         properties.getInteger(KAFKA_REQUEST_TIMEOUT),
         properties.getInteger(KAFKA_SESSION_TIMEOUT),
-        properties.getInteger(KEY_KAFKA_POLL_MAX));
+        properties.getInteger(KEY_KAFKA_POLL_MAX),
+        keyDeserializer,
+        valueDeserializer);
   }
 
   private ITransform createTransformer() {
@@ -94,6 +106,20 @@ public class EtlContext extends AbstractModule {
     }
   }
 
+  private Optional<String> searchAvroSchema() {
+    String avroSchemaPath = properties.getString(KEY_JSON_AVRO_SCHEMA, EMPTY);
+    if (isBlank(avroSchemaPath) || !FileHelper.existFile(avroSchemaPath)) {
+      return Optional.empty();
+    }
+
+    String avroSchemaContent = FileHelper.file2stringQuietly(avroSchemaPath);
+    if (isBlank(avroSchemaContent)) {
+      return Optional.empty();
+    }
+
+    return Optional.of(avroSchemaContent);
+  }
+
   @Override
   protected void configure() {
     requireNonNull(vertx, "vertx must not be null");
@@ -117,7 +143,10 @@ public class EtlContext extends AbstractModule {
     IAdditionalConfig additionalConfig = new DefaultAdditionalConfig();
     bind(IAdditionalConfig.class).toInstance(additionalConfig);
     bind(IProducerManager.class).toInstance(createProducerManager(additionalConfig));
-    bind(IConsumerManager.class).toInstance(createConsumerManager());
+    Optional<String> avroSchema = searchAvroSchema();
+    bind(IConsumerManager.class).toInstance(createConsumerManager(new DefaultDeserializer(),
+        avroSchema.isPresent() ? new AvroToJsonDeserializer(avroSchema.get())
+            : new DefaultDeserializer()));
     bind(ITransform.class).toInstance(createTransformer());
     bind(IProducerCallback.class).to(DefaultProducerCallback.class);
     bind(IPartitionKeyCalculator.class).to(DefaultPartitionKeyCalculator.class);

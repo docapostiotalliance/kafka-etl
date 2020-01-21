@@ -26,8 +26,6 @@ public class GenericConfig {
     config.put(ProducerConfig.RETRIES_CONFIG, kafkaRetries);
     config.put(ProducerConfig.ACKS_CONFIG, "1");
 
-
-
     if (MapUtils.isNotEmpty(producerAdditionalConfig)) {
       config.putAll(producerAdditionalConfig);
     }

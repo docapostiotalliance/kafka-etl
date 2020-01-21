@@ -15,6 +15,7 @@ Here is a sample of configuration file:
   "kafka.fetch.retries": 3,
   "transformer.class": "org.kafka.etl.transform.impl.DefaultTransform",
   "transformer.classpath": "/home/ineumann/my-transformer.jar",
+  "avro.json.schema.path": "/home/ineumann/my-schema.json",
   "group.id": "etl",
   "topic.input": "IN",
   "topic.output": "OUT",
@@ -35,6 +36,7 @@ Here is a sample of configuration file:
 * `poll.size`: number of records that are read and commit in one loop;
 * `consumer.record.size`: max size of a record that will be consumed in the input topic;
 * `producer.record.size`: max size of a record that will be produced in the output topic.
+* `avro.json.schema.path` (optional): path to a json file that contain the avro schema to unserialize data.
 
 ## Implementation of the transformations rules
 

@@ -1,7 +1,9 @@
 package org.kafka.etl.kafka.impl;
 
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.common.serialization.StringDeserializer;
 import org.kafka.etl.kafka.IConsumerManager;
+import org.kafka.etl.kafka.IDeserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,15 +21,22 @@ public class ConsumerManager implements IConsumerManager {
   private final String consumerHost;
   private final Integer requestTimeout;
   private final Integer sessionTimeout;
+  private IDeserializer keyDeserializer;
+  private IDeserializer valueDeserializer;
 
   public ConsumerManager(String consumerHost,
                          Integer requestTimeout,
                          Integer sessionTimeout,
-                         Integer maxPoll) {
+                         Integer maxPoll,
+                         IDeserializer keyDeserializer,
+                         IDeserializer valueDeserializer) {
     this.maxPoll = requireNonNull(maxPoll, "maxPoll must not be empty");
     this.consumerHost = requireNonNull(consumerHost, "consumerHost must not be empty");
     this.requestTimeout = requireNonNull(requestTimeout, "requestTimeout must not be empty");
     this.sessionTimeout = requireNonNull(sessionTimeout, "sessionTimeout must not be empty");
+    this.keyDeserializer = requireNonNull(keyDeserializer, "keyDeserializer must not be null");
+    this.valueDeserializer =
+        requireNonNull(valueDeserializer, "valueDeserializer must not be null");
   }
 
   @Override
@@ -46,7 +55,8 @@ public class ConsumerManager implements IConsumerManager {
                                                    List<String> topics,
                                                    Map<String, Object> consumerAdditionalConfig) {
     Properties config = getConsumerConfig(groupId, consumerAdditionalConfig);
-    KafkaConsumer<String, String> consumer = new KafkaConsumer<>(config);
+    KafkaConsumer<String, String> consumer =
+        new KafkaConsumer<>(config, keyDeserializer, valueDeserializer);
     consumer.subscribe(topics);
     LOGGER.info(
         "[ConsumerManager][getConsumer][topics] Creating consumer with the following config : topics = {}, group = {}, conf = {}",
