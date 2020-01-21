@@ -1,6 +1,6 @@
-# Kafka etl
+# Kafka ETL
 
-This project aims to be able to copy kafka from a topic to another and to be able to transform the data format.
+This project aims to be make easier the copy of kafka records from a topic to another and to be able to transform the data before copying them.
 
 ## Configuration
 
@@ -48,4 +48,4 @@ public interface ITransform {
 }
 ```
 
-To be able to implements this interface, your jar module need to use the `kafka-etl-core` maven dependancy.
+To be able to implements this interface, your jar module need to use the `kafka-etl-core` maven dependency.
