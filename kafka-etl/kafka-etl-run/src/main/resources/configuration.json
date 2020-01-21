@@ -1,6 +1,6 @@
 {
-  "kafka.consumer.hosts": "etl_kafka:9042",
-  "kafka.producer.hosts": "etl_kafka:9042",
+  "kafka.consumer.hosts": "etl_kafka:9092",
+  "kafka.producer.hosts": "etl_kafka:9092",
   "kafka.session.timeout": 90000,
   "kafka.request.timeout": 95000,
   "kafka.fetch.retries": 3,
