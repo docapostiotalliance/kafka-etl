@@ -24,6 +24,7 @@ import javax.inject.Named;
 import java.util.Collections;
 import java.util.List;
 
+import static java.util.Objects.requireNonNull;
 import static org.kafka.etl.ioc.BindedConstants.GROUP_ID;
 import static org.kafka.etl.ioc.BindedConstants.INPUT_TOPIC;
 import static org.kafka.etl.ioc.BindedConstants.OUTPUT_TOPIC;
@@ -69,16 +70,10 @@ public class TopicStreamer implements ITopicStreamer {
   private KafkaConsumer<String, String> consumer;
   private KafkaProducer<String, String> producer;
 
-  @PostConstruct
-  public void init() {
-    consumer = consumerManager.getConsumer(groupId,
-        inputTopic,
-        additionalConfig.consumerAdditionalConfig());
-    producer = producerManager.getProducer();
-  }
-
   @Override
   public void startStream() {
+    init();
+
     try {
       processQueue();
     } catch (Exception e) {
@@ -86,7 +81,8 @@ public class TopicStreamer implements ITopicStreamer {
           "[TopicStreamer][processQueueQuietly] Shutdown : msg = {}, type = {}, consumer = {}",
           e.getMessage(),
           e.getClass().getSimpleName(),
-          null == consumer ? null : consumer.subscription());
+          null == consumer ? null : consumer.subscription(),
+          e);
     } finally {
       LOGGER.info(
           "[TopicStreamer][processQueueQuietly] Closing consumer and producer : consumer.subscription = {}",
@@ -99,6 +95,13 @@ public class TopicStreamer implements ITopicStreamer {
         consumer.close();
       }
     }
+  }
+
+  private void init() {
+    consumer = requireNonNull(consumerManager.getConsumer(groupId,
+        inputTopic,
+        additionalConfig.consumerAdditionalConfig()), "consumer must not be null");
+    producer = requireNonNull(producerManager.getProducer(), "producer must not be null");
   }
 
   private void processQueue() {
