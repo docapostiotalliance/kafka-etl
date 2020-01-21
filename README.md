@@ -75,5 +75,5 @@ In this case, the previous `mvn` command has also generate a jar file which is n
 
 ```bash
 $ docker exec -it etl_run bash
-root@94374f0953cd:/# apt-get update -y; apt-get install dns-utils telnet net-tools vim nmap -y
+root@94374f0953cd:/# apt-get update -y; apt-get install dnsutils telnet net-tools vim nmap -y
 ```
