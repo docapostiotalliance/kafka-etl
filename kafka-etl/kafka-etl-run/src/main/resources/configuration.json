@@ -1,6 +1,6 @@
 {
-  "kafka.consumer.hosts": "etl_kafka:9092",
-  "kafka.producer.hosts": "etl_kafka:9092",
+  "kafka.consumer.hosts": "172.21.0.3:9092",
+  "kafka.producer.hosts": "172.21.0.3:9092",
   "kafka.session.timeout": 90000,
   "kafka.request.timeout": 95000,
   "kafka.fetch.retries": 3,
@@ -9,7 +9,7 @@
   "topic.input": "IN",
   "topic.output": "OUT",
   "poll.timeout": 1000,
-  "kafka.poll.max": 10,
+  "poll.size": 10,
   "consumer.record.size": 4194304,
   "producer.record.size": 4194304
 }

@@ -18,20 +18,20 @@ public class ConsumerManager implements IConsumerManager {
   private static final Logger LOGGER = LoggerFactory.getLogger(ConsumerManager.class);
 
   private final Integer maxPoll;
-  private final String consumerHost;
+  private final String kafkaHosts;
   private final Integer requestTimeout;
   private final Integer sessionTimeout;
   private final IDeserializer keyDeserializer;
   private final IDeserializer valueDeserializer;
 
-  public ConsumerManager(String consumerHost,
+  public ConsumerManager(String kafkaHosts,
                          Integer requestTimeout,
                          Integer sessionTimeout,
                          Integer maxPoll,
                          IDeserializer keyDeserializer,
                          IDeserializer valueDeserializer) {
     this.maxPoll = requireNonNull(maxPoll, "maxPoll must not be empty");
-    this.consumerHost = requireNonNull(consumerHost, "consumerHost must not be empty");
+    this.kafkaHosts = requireNonNull(kafkaHosts, "kafkaHosts must not be empty");
     this.requestTimeout = requireNonNull(requestTimeout, "requestTimeout must not be empty");
     this.sessionTimeout = requireNonNull(sessionTimeout, "sessionTimeout must not be empty");
     this.keyDeserializer = requireNonNull(keyDeserializer, "keyDeserializer must not be null");
@@ -70,7 +70,7 @@ public class ConsumerManager implements IConsumerManager {
                                        Map<String, Object> consumerAdditionalConfig) {
     return GenericConfig.defaultConsumerConfig(groupId,
         consumerAdditionalConfig,
-        consumerHost,
+        kafkaHosts,
         requestTimeout,
         sessionTimeout,
         maxPoll);

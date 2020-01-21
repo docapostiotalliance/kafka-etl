@@ -38,13 +38,13 @@ public class GenericConfig {
 
   public static Properties defaultConsumerConfig(String groupId,
                                                  Map<String, Object> consumerAdditionalConfig,
-                                                 String consumerHost,
+                                                 String kafkaHost,
                                                  Integer requestTimeout,
                                                  Integer sessionTimeout,
                                                  Integer maxPoll) {
     Properties config = new Properties();
 
-    config.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, consumerHost);
+    config.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, kafkaHost);
     config.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, sessionTimeout);
     config.put(ConsumerConfig.REQUEST_TIMEOUT_MS_CONFIG, requestTimeout);
     config.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, maxPoll);

@@ -95,7 +95,6 @@ public class EtlContext extends AbstractModule {
         "[EtlContext][createConsumerManager] creating consumer with kafkaHosts = {}, requestTimeout = {}, sessionTimeout = {}, pollSize = {}",
         kafkaHost,
         requestTimeout,
-        requestTimeout,
         sessionTimeout,
         pollSize);
     return new ConsumerManager(kafkaHost,

@@ -8,15 +8,15 @@ Here is a sample of configuration file:
 
 ```json
 {
-  "kafka.consumer.hosts": "kaf1:9042|kaf2:9042",
-  "kafka.producer.hosts": "kaf3:9042",
+  "kafka.consumer.hosts": "kaf1:9042",
+  "kafka.producer.hosts": "kaf2:9042",
   "kafka.session.timeout": 90000,
   "kafka.request.timeout": 95000,
   "kafka.fetch.retries": 3,
   "transformer.class": "org.kafka.etl.transform.impl.DefaultTransform",
   "avro.json.schema.path": "/home/ineumann/my-schema.json",
   "group.id": "etl",
-  "topic.input": "IN",
+  "topic.input": "IN"``,
   "topic.output": "OUT",
   "poll.timeout": 1000,
   "poll.size": 10,
