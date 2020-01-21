@@ -69,18 +69,39 @@ public class EtlContext extends AbstractModule {
   }
 
   private IProducerManager createProducerManager(IAdditionalConfig additionalConfig) {
-    return new ProducerManager(properties.getString(KEY_KAFKA_PRODUCER_HOST),
-        properties.getInteger(KAFKA_REQUEST_TIMEOUT),
-        properties.getInteger(KAFKA_FETCH_RETRIES),
+    String kafkaHost = properties.getString(KEY_KAFKA_PRODUCER_HOST);
+    Integer requestTimeout = properties.getInteger(KAFKA_REQUEST_TIMEOUT);
+    Integer fetchRetries = properties.getInteger(KAFKA_FETCH_RETRIES);
+
+    LOGGER.info(
+        "[EtlContext][createProducerManager] creating producer with kafkaHosts = {}, requestTimeout = {}, fetchRetries = {}",
+        kafkaHost,
+        requestTimeout,
+        fetchRetries);
+    return new ProducerManager(kafkaHost,
+        requestTimeout,
+        fetchRetries,
         additionalConfig.producerAdditionalConfig());
   }
 
   private IConsumerManager createConsumerManager(IDeserializer keyDeserializer,
                                                  IDeserializer valueDeserializer) {
-    return new ConsumerManager(properties.getString(KEY_KAFKA_CONSUMER_HOST),
-        properties.getInteger(KAFKA_REQUEST_TIMEOUT),
-        properties.getInteger(KAFKA_SESSION_TIMEOUT),
-        properties.getInteger(KEY_KAFKA_POLL_MAX),
+    String kafkaHost = properties.getString(KEY_KAFKA_CONSUMER_HOST);
+    Integer requestTimeout = properties.getInteger(KAFKA_REQUEST_TIMEOUT);
+    Integer sessionTimeout = properties.getInteger(KAFKA_SESSION_TIMEOUT);
+    Integer pollSize = properties.getInteger(KEY_KAFKA_POLL_MAX);
+
+    LOGGER.info(
+        "[EtlContext][createConsumerManager] creating consumer with kafkaHosts = {}, requestTimeout = {}, sessionTimeout = {}, pollSize = {}",
+        kafkaHost,
+        requestTimeout,
+        requestTimeout,
+        sessionTimeout,
+        pollSize);
+    return new ConsumerManager(kafkaHost,
+        requestTimeout,
+        sessionTimeout,
+        pollSize,
         keyDeserializer,
         valueDeserializer);
   }

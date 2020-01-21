@@ -21,7 +21,7 @@ public class ProducerManager implements IProducerManager {
                          Integer kafkaFetchRetries,
                          Map<String, Object> additionalConfig) {
 
-    this.kafkaHost = requireNonNull(kafkaHost, "producerHost must not be empty");
+    this.kafkaHost = requireNonNull(kafkaHost, "kafkaHost must not be empty");
 
     this.requestTimeout = requireNonNull(requestTimeout, "requestTimeout must not be empty");
 

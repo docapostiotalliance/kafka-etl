@@ -7,6 +7,7 @@ import org.apache.commons.collections4.MapUtils;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.common.serialization.StringSerializer;
 
 public class GenericConfig {
   private static final String KAFKA_OFFSET_RESET_SMALLEST = "latest";
@@ -25,6 +26,8 @@ public class GenericConfig {
     config.put(ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, requestTimeout);
     config.put(ProducerConfig.RETRIES_CONFIG, kafkaRetries);
     config.put(ProducerConfig.ACKS_CONFIG, "1");
+    config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+    config.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
 
     if (MapUtils.isNotEmpty(producerAdditionalConfig)) {
       config.putAll(producerAdditionalConfig);
