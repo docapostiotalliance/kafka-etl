@@ -68,3 +68,13 @@ In order to test quickly, you could use the default implementation that doesn't 
 In this case, the previous `mvn` command has also generate a jar file which is named `kafka-etl-core-1.0.0-SNAPSHOT.jar`
 
 ## Running with docker-compose
+
+# Troubleshooting
+
+## Debuging network in the etl_run container
+
+```bash
+$ docker exec -it elt_run bash
+root# apt-get update -y
+root# apt-get install dns-utils telnet net-tools vim nmap -y
+```

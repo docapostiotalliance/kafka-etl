@@ -144,11 +144,6 @@ public class EtlContext extends AbstractModule {
     return Optional.of(avroSchemaContent);
   }
 
-  @Provides
-  private IAdditionalConfig getYourDependency(Injector injector) {
-    return injector.getInstance(IAdditionalConfig.class);
-  }
-
   @Override
   protected void configure() {
     requireNonNull(vertx, "vertx must not be null");
