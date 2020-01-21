@@ -1,11 +1,10 @@
 {
-  "kafka.consumer.hosts": "localhost:9042",
-  "kafka.producer.hosts": "localhost:9042",
+  "kafka.consumer.hosts": "etl_kafka:9042",
+  "kafka.producer.hosts": "etl_kafka:9042",
   "kafka.session.timeout": 90000,
   "kafka.request.timeout": 95000,
   "kafka.fetch.retries": 3,
   "transformer.class": "org.kafka.etl.transform.impl.DefaultTransform",
-  "transformer.classpath": "/home/ineumann/my-transformer.jar",
   "group.id": "etl",
   "topic.input": "IN",
   "topic.output": "OUT",

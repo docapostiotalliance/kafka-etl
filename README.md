@@ -2,7 +2,7 @@
 
 This project aims to be make easier the copy of kafka records from a topic to another and to be able to transform the data before copying them.
 
-## Configuration
+## Configuration description
 
 Here is a sample of configuration file:
 
@@ -14,7 +14,6 @@ Here is a sample of configuration file:
   "kafka.request.timeout": 95000,
   "kafka.fetch.retries": 3,
   "transformer.class": "org.kafka.etl.transform.impl.DefaultTransform",
-  "transformer.classpath": "/home/ineumann/my-transformer.jar",
   "avro.json.schema.path": "/home/ineumann/my-schema.json",
   "group.id": "etl",
   "topic.input": "IN",
@@ -29,7 +28,6 @@ Here is a sample of configuration file:
 * `kafka.consumer.hosts`: broker (hosts and ports) that contain the input topic;
 * `kafka.producer.hosts`: broker (hosts and ports) that contain the output topic;
 * `transformer.class`: the name of the transformer rules class (go see the next section to get more details);
-* `transformer.classpath`: the jar archive that containing your transformer;
 * `topic.input`: input topic name;
 * `topic.output`: output topic name;
 * `group.id`: group id of the consumer of the input topic;
@@ -51,3 +49,22 @@ public interface ITransform {
 ```
 
 To be able to implements this interface, your jar module need to use the `kafka-etl-core` maven dependency.
+
+# Run the project
+
+## Build the project
+
+First, compile the `etl-run-project` like that:
+
+```shell
+$ cd ~/kafka-etl/kafka-etl
+$ mvn clean install
+```
+
+Then, compile your jar that contain an implementation of the `ITransform` interface. 
+
+In order to test quickly, you could use the default implementation that doesn't do anything but log a trace, which is present in the `kafka-etl-core` artifact.
+
+In this case, the previous `mvn` command has also generate a jar file which is named `kafka-etl-core-1.0.0-SNAPSHOT.jar`
+
+## Running with docker-compose
