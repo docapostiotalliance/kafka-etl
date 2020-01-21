@@ -25,6 +25,8 @@ import org.kafka.etl.kafka.impl.ProducerManager;
 import org.kafka.etl.kafka.impl.TopicStreamer;
 import org.kafka.etl.transform.ITransform;
 import org.kafka.etl.utils.FileHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
@@ -37,6 +39,8 @@ import static org.kafka.etl.ioc.BindedConstants.POLL_TIMEOUT;
 import static org.kafka.etl.ioc.BindedConstants.PRODUCER_RECORD_SIZE;
 
 public class EtlContext extends AbstractModule {
+  private static final Logger LOGGER = LoggerFactory.getLogger(EtlContext.class);
+
   private static final String KEY_KAFKA_CONSUMER_HOST = "kafka.consumer.hosts";
   private static final String KEY_KAFKA_PRODUCER_HOST = "kafka.producer.hosts";
   private static final String KEY_KAFKA_POLL_MAX = "poll.size";
@@ -126,6 +130,9 @@ public class EtlContext extends AbstractModule {
 
     properties = vertx.getOrCreateContext().config();
     requireNonNull(properties, "properties must not be null");
+
+    LOGGER.info("[EtlContext][configure] loading the following configuration : {}",
+        properties.toString());
     bind(JsonObject.class).toInstance(properties);
 
     bindConstant().annotatedWith(Names.named(GROUP_ID)).to(properties.getString(KEY_GROUP_ID));
