@@ -31,7 +31,7 @@ import static org.kafka.etl.ioc.BindedConstants.PRODUCER_RECORD_SIZE;
 public class EtlContext extends AbstractModule {
   private static final String KEY_KAFKA_CONSUMER_HOST = "kafka.consumer.hosts";
   private static final String KEY_KAFKA_PRODUCER_HOST = "kafka.producer.hosts";
-  private static final String KEY_KAFKA_POLL_MAX = "kafka.poll.max";
+  private static final String KEY_KAFKA_POLL_MAX = "poll.size";
   private static final String KAFKA_SESSION_TIMEOUT = "kafka.session.timeout";
   private static final String KAFKA_REQUEST_TIMEOUT = "kafka.request.timeout";
   private static final String KAFKA_FETCH_RETRIES = "kafka.fetch.retries";
