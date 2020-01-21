@@ -9,11 +9,13 @@ import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import org.kafka.etl.kafka.IAdditionalConfig;
 import org.kafka.etl.kafka.IConsumerManager;
+import org.kafka.etl.kafka.IPartitionKeyCalculator;
 import org.kafka.etl.kafka.IProducerCallback;
 import org.kafka.etl.kafka.IProducerManager;
 import org.kafka.etl.kafka.ITopicStreamer;
 import org.kafka.etl.kafka.impl.ConsumerManager;
 import org.kafka.etl.kafka.impl.DefaultAdditionalConfig;
+import org.kafka.etl.kafka.impl.DefaultPartitionKeyCalculator;
 import org.kafka.etl.kafka.impl.DefaultProducerCallback;
 import org.kafka.etl.kafka.impl.ProducerManager;
 import org.kafka.etl.kafka.impl.TopicStreamer;
@@ -23,6 +25,7 @@ import static java.util.Objects.requireNonNull;
 import static org.kafka.etl.ioc.BindedConstants.GROUP_ID;
 import static org.kafka.etl.ioc.BindedConstants.INPUT_TOPIC;
 import static org.kafka.etl.ioc.BindedConstants.OUTPUT_TOPIC;
+import static org.kafka.etl.ioc.BindedConstants.POLL_TIMEOUT;
 
 public class EtlContext extends AbstractModule {
   private static final String KEY_KAFKA_CONSUMER_HOST = "kafka.consumer.hosts";
@@ -35,6 +38,7 @@ public class EtlContext extends AbstractModule {
   private static final String KEY_GROUP_ID = "group.id";
   private static final String KEY_INPUT_TOPIC = "topic.input";
   private static final String KEY_OUTPUT_TOPIC = "topic.output";
+  private static final String KEY_POLL_TIMEOUT = "poll.timeout";
 
   private static final String MSG_ERR_BAD_CLASS_TPL = "%s is not an instance of ITransform";
   private static final String MSG_ERR_INSTANCIATE_TRANSFORM_CLASS_TPL =
@@ -99,6 +103,8 @@ public class EtlContext extends AbstractModule {
         .to(properties.getString(KEY_INPUT_TOPIC));
     bindConstant().annotatedWith(Names.named(OUTPUT_TOPIC))
         .to(properties.getString(KEY_OUTPUT_TOPIC));
+    bindConstant().annotatedWith(Names.named(POLL_TIMEOUT))
+        .to(properties.getInteger(KEY_POLL_TIMEOUT));
 
     IAdditionalConfig additionalConfig = new DefaultAdditionalConfig();
     bind(IAdditionalConfig.class).toInstance(additionalConfig);
@@ -106,6 +112,7 @@ public class EtlContext extends AbstractModule {
     bind(IConsumerManager.class).toInstance(createConsumerManager());
     bind(ITransform.class).toInstance(createTransformer());
     bind(IProducerCallback.class).to(DefaultProducerCallback.class);
+    bind(IPartitionKeyCalculator.class).to(DefaultPartitionKeyCalculator.class);
     bind(ITopicStreamer.class).to(TopicStreamer.class);
   }
 }
