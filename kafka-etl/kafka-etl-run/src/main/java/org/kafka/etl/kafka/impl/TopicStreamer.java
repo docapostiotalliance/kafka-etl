@@ -86,12 +86,18 @@ public class TopicStreamer implements ITopicStreamer {
           "[TopicStreamer][processQueueQuietly] Shutdown : msg = {}, type = {}, consumer = {}",
           e.getMessage(),
           e.getClass().getSimpleName(),
-          consumer.subscription());
+          null == consumer ? null : consumer.subscription());
     } finally {
-      LOGGER.info("[TopicStreamer][processQueueQuietly] Closing consumer and producer : {}",
-          consumer.subscription());
-      producer.close();
-      consumer.close();
+      LOGGER.info(
+          "[TopicStreamer][processQueueQuietly] Closing consumer and producer : consumer.subscription = {}",
+          null == consumer ? null : consumer.subscription());
+      if (null != producer) {
+        producer.close();
+      }
+
+      if (null != consumer) {
+        consumer.close();
+      }
     }
   }
 
