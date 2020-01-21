@@ -21,8 +21,8 @@ public class ConsumerManager implements IConsumerManager {
   private final String consumerHost;
   private final Integer requestTimeout;
   private final Integer sessionTimeout;
-  private IDeserializer keyDeserializer;
-  private IDeserializer valueDeserializer;
+  private final IDeserializer keyDeserializer;
+  private final IDeserializer valueDeserializer;
 
   public ConsumerManager(String consumerHost,
                          Integer requestTimeout,
