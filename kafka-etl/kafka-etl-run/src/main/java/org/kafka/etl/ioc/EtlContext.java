@@ -2,7 +2,6 @@ package org.kafka.etl.ioc;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
 import io.vertx.core.Vertx;
@@ -29,10 +28,11 @@ import static org.kafka.etl.ioc.BindedConstants.POLL_TIMEOUT;
 
 public class EtlContext extends AbstractModule {
   private static final String KEY_KAFKA_CONSUMER_HOST = "kafka.consumer.hosts";
+  private static final String KEY_KAFKA_PRODUCER_HOST = "kafka.producer.hosts";
   private static final String KEY_KAFKA_POLL_MAX = "kafka.poll.max";
   private static final String KAFKA_SESSION_TIMEOUT = "kafka.session.timeout";
   private static final String KAFKA_REQUEST_TIMEOUT = "kafka.request.timeout";
-  private static final String KAFKA_FETCH_RETRIES = "kafka.kafkaFetchRetries";
+  private static final String KAFKA_FETCH_RETRIES = "kafka.fetch.retries";
 
   private static final String KEY_TRANSFORMER = "transformer.class";
   private static final String KEY_GROUP_ID = "group.id";
@@ -52,7 +52,7 @@ public class EtlContext extends AbstractModule {
   }
 
   private IProducerManager createProducerManager(IAdditionalConfig additionalConfig) {
-    return new ProducerManager(properties.getString(KEY_KAFKA_CONSUMER_HOST),
+    return new ProducerManager(properties.getString(KEY_KAFKA_PRODUCER_HOST),
         properties.getInteger(KAFKA_REQUEST_TIMEOUT),
         properties.getInteger(KAFKA_FETCH_RETRIES),
         additionalConfig.producerAdditionalConfig());

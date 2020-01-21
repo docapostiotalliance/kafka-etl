@@ -119,16 +119,17 @@ public class TopicStreamer implements ITopicStreamer {
 
   private void processEvents(ConsumerRecords partitionRecords, TopicPartition partition) {
     List<ConsumerRecord<String, String>> records = partitionRecords.records(partition);
-    records.stream().forEach(record -> processMessage(record.value(),
+    records.stream().forEach(record -> processMessage(record.key(),
+        record.value(),
         new EventKafkaInfos.Builder().offset(record.offset()).topicPartirion(partition).build()));
   }
 
-  private void processMessage(String event, EventKafkaInfos eventKafkaInfos) {
+  private void processMessage(String originalKey, String event, EventKafkaInfos eventKafkaInfos) {
     LOGGER.info("[TopicStreamer][processMessage] process the following record : {}",
         eventKafkaInfos);
     String transformed = transformer.transform(event);
     producerManager.sendEvent(producer,
-        partitionKeyCalculator.generatePartitionKey(transformed),
+        partitionKeyCalculator.generatePartitionKey(originalKey, transformed),
         transformed,
         inputTopic,
         callback);
