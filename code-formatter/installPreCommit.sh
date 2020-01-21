@@ -1,12 +1,12 @@
 #!/bin/bash
 
-DIR="/Users/ineumann/uprodit"
+DIR="/Users/ineumann/kafka-etl"
 GIT_DIR="${DIR}/.git"
 HOOKS_DIR="${GIT_DIR}/hooks"
 CODE_FORMATTER_DIR="${HOOKS_DIR}/code-formatter"
 BIN_DIR="${CODE_FORMATTER_DIR}/bin"
 CODE_STYLE_DIR="${HOOKS_DIR}/code-style"
-SRC_DIR="${DIR}/prodit-batch/src/main/resources/code-formatter"
+SRC_DIR="${DIR}/code-formatter"
 
 create_if_needed() {
     if [ ! -d  "$1" ]; then
