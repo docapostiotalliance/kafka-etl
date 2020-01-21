@@ -1,0 +1,33 @@
+#!/bin/bash
+
+root="$(git rev-parse --show-toplevel)"
+[ -d "$root" ] || exit 1
+
+owndir="$(cd "$(dirname "$0")"; pwd -P)"
+
+
+git diff --name-only --cached | {
+  labort=0
+  filelist=''
+  declare -a filesarray
+
+  i=0
+  while IFS= read -r orig ; do
+    orig="${root}/${orig}"
+
+    # file is getting deleted, ignore
+    [ -f "$orig" ] || continue
+
+    filelist="$filelist $orig";
+    filesarray[$i]="$orig"
+
+    (( i++ ))
+  done
+
+  $owndir/code-formatter/codeFormat.sh "$filelist" || labort=1
+  for f in "${filesarray[@]}"; do
+      git add "$f"
+  done
+
+  exit $labort
+} || abort=1

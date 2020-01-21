@@ -63,5 +63,6 @@ local.properties
 *.rpm
 *.zip
 
+code-formatter/bin/
 target/
 hs_err_pid*.log

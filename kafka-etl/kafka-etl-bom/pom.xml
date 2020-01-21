@@ -29,6 +29,11 @@
         <version>${commons-lang3.version}</version>
       </dependency>
       <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-collections4</artifactId>
+        <version>${commons-collections4.version}</version>
+      </dependency>
+      <dependency>
         <groupId>org.apache.kafka</groupId>
         <artifactId>kafka_${kafka.scala.version}</artifactId>
         <version>${kafka.version}</version>
