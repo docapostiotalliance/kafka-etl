@@ -8,9 +8,9 @@ import java.util.Map;
 public interface IConsumerManager {
   KafkaConsumer<String, String> getConsumer(String groupId,
                                             String topic,
-                                            Map<String, Object> kafkaConsumerAdditionalConfig);
+                                            Map<String, Object> consumerAdditionalConfig);
 
   KafkaConsumer<String, String> getConsumer(String groupId,
                                             List<String> topics,
-                                            Map<String, Object> kafkaAdditionalConsumerConfig);
+                                            Map<String, Object> consumerAdditionalConfig);
 }

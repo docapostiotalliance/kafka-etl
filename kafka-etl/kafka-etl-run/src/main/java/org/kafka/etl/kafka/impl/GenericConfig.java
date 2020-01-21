@@ -15,7 +15,7 @@ public class GenericConfig {
     // Nothing to do
   }
 
-  public static Properties defaultProducerConfig(Map<String, Object> kafkaAdditionalProducerConfig,
+  public static Properties defaultProducerConfig(Map<String, Object> producerAdditionalConfig,
                                                  String kafkaHost,
                                                  Integer requestTimeout,
                                                  Integer kafkaRetries) {
@@ -28,15 +28,15 @@ public class GenericConfig {
 
 
 
-    if (MapUtils.isNotEmpty(kafkaAdditionalProducerConfig)) {
-      config.putAll(kafkaAdditionalProducerConfig);
+    if (MapUtils.isNotEmpty(producerAdditionalConfig)) {
+      config.putAll(producerAdditionalConfig);
     }
 
     return config;
   }
 
   public static Properties defaultConsumerConfig(String groupId,
-                                                 Map<String, Object> kafkaAdditionalConsumerConfig,
+                                                 Map<String, Object> consumerAdditionalConfig,
                                                  String consumerHost,
                                                  Integer requestTimeout,
                                                  Integer sessionTimeout,
@@ -51,8 +51,8 @@ public class GenericConfig {
     config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, KAFKA_OFFSET_RESET_SMALLEST);
     config.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
 
-    if (MapUtils.isNotEmpty(kafkaAdditionalConsumerConfig)) {
-      config.putAll(kafkaAdditionalConsumerConfig);
+    if (MapUtils.isNotEmpty(consumerAdditionalConfig)) {
+      config.putAll(consumerAdditionalConfig);
     }
 
     return config;

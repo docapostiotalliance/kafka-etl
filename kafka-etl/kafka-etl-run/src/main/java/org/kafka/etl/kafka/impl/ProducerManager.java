@@ -19,14 +19,14 @@ public class ProducerManager implements IProducerManager {
   public ProducerManager(String kafkaHost,
                          Integer requestTimeout,
                          Integer kafkaFetchRetries,
-                         Map<String, Object> extConfig) {
+                         Map<String, Object> additionalConfig) {
 
     this.kafkaHost = requireNonNull(kafkaHost, "producerHost must not be empty");
 
     this.requestTimeout = requireNonNull(requestTimeout, "requestTimeout must not be empty");
 
     this.kafkaRetries = requireNonNull(kafkaFetchRetries, "kafkaFetchRetries must not be null");
-    this.kafkaProducer = kafkaProducer(extConfig);
+    this.kafkaProducer = kafkaProducer(additionalConfig);
   }
 
   @Override
