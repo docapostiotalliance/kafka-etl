@@ -6,22 +6,14 @@ import org.kafka.etl.kafka.IAdditionalConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Named;
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.kafka.etl.ioc.BindedConstants.CONSUMER_RECORD_SIZE;
-import static org.kafka.etl.ioc.BindedConstants.PRODUCER_RECORD_SIZE;
 
 public class DefaultAdditionalConfig implements IAdditionalConfig {
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultAdditionalConfig.class);
 
-  @Inject
-  @Named(CONSUMER_RECORD_SIZE)
   private Integer consumerRecordSize;
 
-  @Inject
-  @Named(PRODUCER_RECORD_SIZE)
   private Integer producerRecordSize;
 
   @Override
@@ -46,5 +38,39 @@ public class DefaultAdditionalConfig implements IAdditionalConfig {
       config.put(ConsumerConfig.MAX_PARTITION_FETCH_BYTES_CONFIG, consumerRecordSize);
     }
     return config;
+  }
+
+  public Integer getConsumerRecordSize() {
+    return consumerRecordSize;
+  }
+
+  public void setConsumerRecordSize(Integer consumerRecordSize) {
+    this.consumerRecordSize = consumerRecordSize;
+  }
+
+  public Integer getProducerRecordSize() {
+    return producerRecordSize;
+  }
+
+  public void setProducerRecordSize(Integer producerRecordSize) {
+    this.producerRecordSize = producerRecordSize;
+  }
+
+  public static class Builder {
+    DefaultAdditionalConfig config = new DefaultAdditionalConfig();
+
+    public Builder producerRecordSize(Integer producerRecordSize) {
+      config.setProducerRecordSize(producerRecordSize);
+      return this;
+    }
+
+    public Builder consumerRecordSize(Integer consumerRecordSize) {
+      config.setConsumerRecordSize(consumerRecordSize);
+      return this;
+    }
+
+    public DefaultAdditionalConfig build() {
+      return config;
+    }
   }
 }

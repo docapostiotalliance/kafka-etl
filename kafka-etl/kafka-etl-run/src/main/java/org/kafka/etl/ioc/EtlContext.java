@@ -5,6 +5,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Optional;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Injector;
+import com.google.inject.Provides;
 import com.google.inject.name.Names;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
@@ -31,12 +33,10 @@ import org.slf4j.LoggerFactory;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.kafka.etl.ioc.BindedConstants.CONSUMER_RECORD_SIZE;
 import static org.kafka.etl.ioc.BindedConstants.GROUP_ID;
 import static org.kafka.etl.ioc.BindedConstants.INPUT_TOPIC;
 import static org.kafka.etl.ioc.BindedConstants.OUTPUT_TOPIC;
 import static org.kafka.etl.ioc.BindedConstants.POLL_TIMEOUT;
-import static org.kafka.etl.ioc.BindedConstants.PRODUCER_RECORD_SIZE;
 
 public class EtlContext extends AbstractModule {
   private static final Logger LOGGER = LoggerFactory.getLogger(EtlContext.class);
@@ -124,6 +124,11 @@ public class EtlContext extends AbstractModule {
     return Optional.of(avroSchemaContent);
   }
 
+  @Provides
+  private IAdditionalConfig getYourDependency(Injector injector) {
+    return injector.getInstance(IAdditionalConfig.class);
+  }
+
   @Override
   protected void configure() {
     requireNonNull(vertx, "vertx must not be null");
@@ -142,14 +147,13 @@ public class EtlContext extends AbstractModule {
         .to(properties.getString(KEY_OUTPUT_TOPIC));
     bindConstant().annotatedWith(Names.named(POLL_TIMEOUT))
         .to(properties.getInteger(KEY_POLL_TIMEOUT));
-    bindConstant().annotatedWith(Names.named(PRODUCER_RECORD_SIZE))
-        .to(properties.getInteger(KEY_PRODUCER_RECORD_SIZE));
-    bindConstant().annotatedWith(Names.named(CONSUMER_RECORD_SIZE))
-        .to(properties.getInteger(KEY_CONSUMER_RECORD_SIZE));
 
-    IAdditionalConfig additionalConfig = new DefaultAdditionalConfig();
-    bind(IAdditionalConfig.class).toInstance(additionalConfig);
-    bind(IProducerManager.class).toInstance(createProducerManager(additionalConfig));
+    Integer producerRecordSize = properties.getInteger(KEY_PRODUCER_RECORD_SIZE);
+    Integer consumerRecordSize = properties.getInteger(KEY_CONSUMER_RECORD_SIZE);
+    IAdditionalConfig config = new DefaultAdditionalConfig.Builder()
+        .consumerRecordSize(consumerRecordSize).producerRecordSize(producerRecordSize).build();
+    bind(IAdditionalConfig.class).toInstance(config);
+    bind(IProducerManager.class).toInstance(createProducerManager(config));
     Optional<String> avroSchema = searchAvroSchema();
     bind(IConsumerManager.class).toInstance(createConsumerManager(new DefaultDeserializer(),
         avroSchema.isPresent() ? new AvroToJsonDeserializer(avroSchema.get())
