@@ -8,5 +8,8 @@
   "group.id": "etl",
   "topic.input": "IN",
   "topic.output": "OUT",
-  "poll.timeout": 1000
+  "poll.timeout": 1000,
+  "kafka.poll.max": 10,
+  "consumer.record.size": 4194304,
+  "producer.record.size": 4194304
 }

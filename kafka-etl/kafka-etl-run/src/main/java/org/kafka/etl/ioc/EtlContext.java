@@ -21,10 +21,12 @@ import org.kafka.etl.kafka.impl.TopicStreamer;
 import org.kafka.etl.transform.ITransform;
 
 import static java.util.Objects.requireNonNull;
+import static org.kafka.etl.ioc.BindedConstants.CONSUMER_RECORD_SIZE;
 import static org.kafka.etl.ioc.BindedConstants.GROUP_ID;
 import static org.kafka.etl.ioc.BindedConstants.INPUT_TOPIC;
 import static org.kafka.etl.ioc.BindedConstants.OUTPUT_TOPIC;
 import static org.kafka.etl.ioc.BindedConstants.POLL_TIMEOUT;
+import static org.kafka.etl.ioc.BindedConstants.PRODUCER_RECORD_SIZE;
 
 public class EtlContext extends AbstractModule {
   private static final String KEY_KAFKA_CONSUMER_HOST = "kafka.consumer.hosts";
@@ -39,6 +41,8 @@ public class EtlContext extends AbstractModule {
   private static final String KEY_INPUT_TOPIC = "topic.input";
   private static final String KEY_OUTPUT_TOPIC = "topic.output";
   private static final String KEY_POLL_TIMEOUT = "poll.timeout";
+  private static final String KEY_CONSUMER_RECORD_SIZE = "consumer.record.size";
+  private static final String KEY_PRODUCER_RECORD_SIZE = "producer.record.size";
 
   private static final String MSG_ERR_BAD_CLASS_TPL = "%s is not an instance of ITransform";
   private static final String MSG_ERR_INSTANCIATE_TRANSFORM_CLASS_TPL =
@@ -105,6 +109,10 @@ public class EtlContext extends AbstractModule {
         .to(properties.getString(KEY_OUTPUT_TOPIC));
     bindConstant().annotatedWith(Names.named(POLL_TIMEOUT))
         .to(properties.getInteger(KEY_POLL_TIMEOUT));
+    bindConstant().annotatedWith(Names.named(PRODUCER_RECORD_SIZE))
+        .to(properties.getInteger(KEY_PRODUCER_RECORD_SIZE));
+    bindConstant().annotatedWith(Names.named(CONSUMER_RECORD_SIZE))
+        .to(properties.getInteger(KEY_CONSUMER_RECORD_SIZE));
 
     IAdditionalConfig additionalConfig = new DefaultAdditionalConfig();
     bind(IAdditionalConfig.class).toInstance(additionalConfig);
