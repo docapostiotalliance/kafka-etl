@@ -17,6 +17,7 @@
     <commons-collections4.version>4.1</commons-collections4.version>
     <kafka.scala.version>2.11</kafka.scala.version>
     <kafka.version>0.10.0.0</kafka.version>
+    <avro.version>1.8.2</avro.version>
     <vertx.version>3.4.1</vertx.version>
     <guice.version>4.1.0</guice.version>
   </properties>
