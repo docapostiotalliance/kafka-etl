@@ -67,7 +67,7 @@ In order to test quickly, you could use the default implementation that doesn't 
 
 In this case, the previous `mvn` command has also generate a jar file which is named `kafka-etl-core-1.0.0-SNAPSHOT.jar`
 
-## Testing with docker-compose (development environment)
+## Test with docker-compose (development environment)
 
 ### Run kafka and zookeeper
 
@@ -129,7 +129,7 @@ $ cd ~/kafka-etl/kafka-etl
 $ docker-compose up etl_run
 ```
 
-## Running in production
+## Run in production
 
 Follow the previous section but:
 - skip the kafka and zookeeper part (we will assume that you already have your kafka brokers installed in production);
