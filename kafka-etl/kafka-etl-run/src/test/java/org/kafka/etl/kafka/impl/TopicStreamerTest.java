@@ -34,79 +34,81 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class TopicStreamerTest {
 
-    @Mock
-    private IConsumerManager consumerManager;
+  @Mock
+  private IConsumerManager consumerManager;
 
-    @Mock
-    private IProducerManager producerManager;
+  @Mock
+  private IProducerManager producerManager;
 
-    @Mock
-    private ITransform transformer;
+  @Mock
+  private ITransform transformer;
 
-    @Mock
-    private IProducerCallback callback;
+  @Mock
+  private IProducerCallback callback;
 
-    @Mock
-    private IAdditionalConfig additionalConfig;
+  @Mock
+  private IAdditionalConfig additionalConfig;
 
-    @Mock
-    private IPartitionKeyCalculator partitionKeyCalculator;
+  @Mock
+  private IPartitionKeyCalculator partitionKeyCalculator;
 
-    private String groupId = "gid";
+  private String groupId = "gid";
 
-    private String inputTopic = "some_topic";
+  private String inputTopic = "some_topic";
 
-    private String outputTopic = "some_topic_json";
+  private String outputTopic = "some_topic_json";
 
-    private Integer pollTimeout = 2000;
+  private Integer pollTimeout = 2000;
 
-    @Mock
-    private KafkaConsumer<String, String> consumer;
-    @Mock
-    private KafkaProducer<String, String> producer;
+  @Mock
+  private KafkaConsumer<String, String> consumer;
+  @Mock
+  private KafkaProducer<String, String> producer;
 
-    private TopicStreamer topicStreamer;
+  private TopicStreamer topicStreamer;
 
-    @Before
-    public void init() {
-        MockitoAnnotations.initMocks(this);
-//        transformer = new DefaultTransform();
-        topicStreamer = new TopicStreamer(consumerManager,
-                producerManager,
-                transformer,
-                callback,
-                additionalConfig,
-                partitionKeyCalculator,
-                groupId,
-                inputTopic,
-                outputTopic,
-                pollTimeout,
-                consumer,
-                producer);
-    }
+  @Before
+  public void init() {
+    MockitoAnnotations.initMocks(this);
+    // transformer = new DefaultTransform();
+    topicStreamer = new TopicStreamer(consumerManager,
+        producerManager,
+        transformer,
+        callback,
+        additionalConfig,
+        partitionKeyCalculator,
+        groupId,
+        inputTopic,
+        outputTopic,
+        pollTimeout,
+        consumer,
+        producer);
+  }
 
-    @Test
-    public void test_() {
-        String outputRecord = "foo bar";
-        List<ConsumerRecord<String, String>> recordList = new ArrayList<>();
-        ConsumerRecord<String, String> consumerRecord =
-                new ConsumerRecord<>(inputTopic, 1, 1L, "foo", "bar");
-        recordList.add(consumerRecord);
-        TopicPartition partition = new TopicPartition(inputTopic, 1);
-        Map<TopicPartition, List<ConsumerRecord>> e = new HashMap<>();
-        e.put(partition, Collections.singletonList(consumerRecord));
-        ConsumerRecords consumerRecords = new ConsumerRecords(e);
+  @Test
+  public void test_ok() {
+    String outputRecord = "foo bar";
+    List<ConsumerRecord<String, String>> recordList = new ArrayList<>();
+    ConsumerRecord<String, String> consumerRecord =
+        new ConsumerRecord<>(inputTopic, 1, 1L, "foo", "bar");
+    recordList.add(consumerRecord);
+    TopicPartition partition = new TopicPartition(inputTopic, 1);
+    Map<TopicPartition, List<ConsumerRecord>> e = new HashMap<>();
+    e.put(partition, Collections.singletonList(consumerRecord));
+    ConsumerRecords consumerRecords = new ConsumerRecords(e);
 
-        when(transformer.transform(eq("bar"))).thenReturn(outputRecord);
+    when(transformer.transform(eq("bar"))).thenReturn(outputRecord);
 
-        topicStreamer.processEvents(consumerRecords, partition);
+    topicStreamer.processEvents(consumerRecords, partition);
 
-        verify(partitionKeyCalculator).generatePartitionKey("foo", outputRecord);
+    verify(partitionKeyCalculator).generatePartitionKey("foo", outputRecord);
 
-        verify(producerManager, atLeastOnce()).sendEvent(eq(producer),
-                any(),
-                eq("foo bar"),
-                eq(inputTopic),
-                eq(callback));
-    }
+    verify(producerManager, atLeastOnce()).sendEvent(eq(producer),
+        any(),
+        eq("foo bar"),
+        eq(inputTopic),
+        eq(callback));
+  }
+
+
 }
