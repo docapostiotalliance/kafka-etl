@@ -18,9 +18,7 @@ import org.kafka.etl.transform.ITransform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Named;
-
 import java.util.Collections;
 import java.util.List;
 
@@ -69,6 +67,37 @@ public class TopicStreamer implements ITopicStreamer {
 
   private KafkaConsumer<String, String> consumer;
   private KafkaProducer<String, String> producer;
+
+
+  public TopicStreamer(IConsumerManager consumerManager,
+                       IProducerManager producerManager,
+                       ITransform transformer,
+                       IProducerCallback callback,
+                       IAdditionalConfig additionalConfig,
+                       IPartitionKeyCalculator partitionKeyCalculator,
+                       String groupId,
+                       String inputTopic,
+                       String outputTopic,
+                       Integer pollTimeout,
+                       KafkaConsumer<String, String> consumer,
+                       KafkaProducer<String, String> producer) {
+    this.consumerManager = consumerManager;
+    this.producerManager = producerManager;
+    this.transformer = transformer;
+    this.callback = callback;
+    this.additionalConfig = additionalConfig;
+    this.partitionKeyCalculator = partitionKeyCalculator;
+    this.groupId = groupId;
+    this.inputTopic = inputTopic;
+    this.outputTopic = outputTopic;
+    this.pollTimeout = pollTimeout;
+    this.consumer = consumer;
+    this.producer = producer;
+  }
+
+  public TopicStreamer() {
+    // do nothing
+  }
 
   @Override
   public void startStream() {
@@ -126,7 +155,7 @@ public class TopicStreamer implements ITopicStreamer {
     records.partitions().forEach(partition -> processEvents(records, partition));
   }
 
-  private void processEvents(ConsumerRecords partitionRecords, TopicPartition partition) {
+  public void processEvents(ConsumerRecords partitionRecords, TopicPartition partition) {
     List<ConsumerRecord<String, String>> records = partitionRecords.records(partition);
     records.stream().forEach(record -> processMessage(record.key(),
         record.value(),
