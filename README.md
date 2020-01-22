@@ -1,6 +1,6 @@
 # Kafka ETL
 
-This project aims to be make easier the copy of kafka records from a topic to another and to be able to transform the data before copying them.
+This project aims to make easier the copy of kafka records from a topic to another and to be able to transform the data before copying them.
 
 ## Configuration description
 
@@ -16,7 +16,7 @@ Here is a sample of configuration file:
   "transformer.class": "org.kafka.etl.transform.impl.DefaultTransform",
   "avro.json.schema.path": "/home/ineumann/my-schema.json",
   "group.id": "etl",
-  "topic.input": "IN"``,
+  "topic.input": "IN",
   "topic.output": "OUT",
   "poll.timeout": 1000,
   "poll.size": 10,
@@ -48,7 +48,7 @@ public interface ITransform {
 }
 ```
 
-To be able to implements this interface, your jar module need to use the `kafka-etl-core` maven dependency.
+To be able to implement this interface, your jar module need to use the `kafka-etl-core` as a maven (or graddle or whatever) dependency.
 
 # Run the project
 
@@ -131,7 +131,7 @@ $ docker-compose up etl_run
 
 ## Running in production
 
-Follow the previous section but :
+Follow the previous section but:
 - skip the kafka and zookeeper part (we will assume that you already have your kafka brokers installed in production);
 - replace the ips by your kafka production hostnames in the JSON configuration file;
 - make another `docker-compose.yml` file that only contain:
@@ -151,8 +151,9 @@ services:
     command: /bin/bash -c "java -jar /kafka-etl-runnable.jar -conf /config.json -classpath /transformer.jar:* && while true; do echo \"debug with 'docker exec -it etl_run bash'\"; sleep 20; done"
 ```
 
-Replace the jar like it was said in the previous section.
-You also can use another JSON configuration file that will be manage by something like puppet/chef/ansible (you need to change the volume path if it's the case).
+Replace the `kafka-etl-core-1.0.0-SNAPSHOT.jar` jar file by your own jar implementing `ITransform` interface.
+
+You can also use another JSON configuration file that will be manage by something like puppet/chef/ansible (you need to change the volume path if it's the case).
 
 ## Troubleshooting
 
