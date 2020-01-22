@@ -34,7 +34,7 @@ Here is a sample of configuration file:
 * `poll.size`: number of records to are read and commit in one loop;
 * `consumer.record.size`: max size of a record that will be consumed in the input topic;
 * `producer.record.size`: max size of a record that will be produced in the output topic.
-* `avro.json.schema.path` (optional): path to a json file that contain the avro schema to unserialize data.
+* `avro.json.schema.path`: (optional): path to a json file that contain the avro schema to unserialize data.
 
 ## Implementation of the transformations rules
 
