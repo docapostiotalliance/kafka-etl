@@ -22,7 +22,9 @@ import javax.annotation.PostConstruct;
 import javax.inject.Named;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static java.util.Objects.requireNonNull;
 import static org.kafka.etl.ioc.BindedConstants.GROUP_ID;
@@ -136,7 +138,12 @@ public class TopicStreamer implements ITopicStreamer {
   private void processMessage(String originalKey, String event, EventKafkaInfos eventKafkaInfos) {
     LOGGER.info("[TopicStreamer][processMessage] process the following record : {}",
         eventKafkaInfos);
-    String transformed = transformer.transform(event);
+    Map<String, String> metadata = new HashMap<>();
+    metadata.put("offset", String.valueOf(eventKafkaInfos.getOffset()));
+    metadata.put("topic", eventKafkaInfos.getTopic());
+    metadata.put("partition", String.valueOf(eventKafkaInfos.getPartition()));
+    metadata.put("key", originalKey);
+    String transformed = transformer.transform(event, metadata);
     producerManager.sendEvent(producer,
         partitionKeyCalculator.generatePartitionKey(originalKey, transformed),
         transformed,
