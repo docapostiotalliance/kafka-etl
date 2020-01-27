@@ -97,7 +97,7 @@ public class TopicStreamerTest {
     e.put(partition, Collections.singletonList(consumerRecord));
     ConsumerRecords consumerRecords = new ConsumerRecords(e);
 
-    when(transformer.transform(eq("bar"))).thenReturn(outputRecord);
+    when(transformer.transform(eq("bar"), any())).thenReturn(outputRecord);
 
     topicStreamer.processEvents(consumerRecords, partition);
 
