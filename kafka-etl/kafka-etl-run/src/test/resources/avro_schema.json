@@ -1,0 +1,11 @@
+{
+  "name": "TestClass",
+  "type": "record",
+  "namespace": "com.acme.avro",
+  "fields": [
+    {
+      "name": "test",
+      "type": "string"
+    }
+  ]
+}

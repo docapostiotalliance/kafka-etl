@@ -1,6 +1,6 @@
 # Kafka ETL
 
-This project aims to make easier the copy of kafka records from a topic to another and to be able to transform the data before copying them.
+This project aims to facilitate the copying of kafka records from one topic to another whilst transform it beforehand.
 
 ## Configuration description
 
@@ -25,20 +25,22 @@ Here is a sample of configuration file:
 }
 ```
 
-* `kafka.consumer.hosts`: broker (hosts and ports) that contain the input topic;
-* `kafka.producer.hosts`: broker (hosts and ports) that contain the output topic;
-* `transformer.class`: the name of the transformer rules class (go see the next section to get more details);
+* `kafka.consumer.hosts`: input broker (host and port pair) that contain the input topic;
+* `kafka.producer.hosts`: output broker (host and port pair) that hosts the output topic;
+* `transformer.class`: the name of the transformer class (for more details in the next section);
 * `topic.input`: input topic name;
 * `topic.output`: output topic name;
-* `group.id`: group id of the consumer of the input topic;
-* `poll.size`: number of records that are read and commit in one loop;
+* `group.id`: group id of the consumer hosting the input topic;
+* `poll.size`: number of records to are read and commit in one loop;
 * `consumer.record.size`: max size of a record that will be consumed in the input topic;
 * `producer.record.size`: max size of a record that will be produced in the output topic.
 * `avro.json.schema.path`: (optional): path to a json file that contain the avro schema to unserialize data.
 
 ## Implementation of the transformations rules
 
-All you need to do is to implement the transformations rules by implementing the following java interface :
+Transformation rules are for mutating records after they get consumed from their original kafka broker (then optionally deserialized) and before they get produced into their destination.
+
+In order to be able to create a data transformer, you need to include the `kafka-etl-core` JAR file into your dependencies and implement the following interface :
 
 ```java
 package org.kafka.etl.transform;
@@ -48,36 +50,34 @@ public interface ITransform {
 }
 ```
 
-To be able to implement this interface, your jar module need to use the `kafka-etl-core` as a maven (or graddle or whatever) dependency.
-
-# Run the project
+# Running the project
 
 ## Build the project
 
-First, compile the `etl-run-project` like that:
+First, compile the `etl-run-project` as follows :
 
 ```shell
 $ cd ~/kafka-etl/kafka-etl
 $ mvn clean install
 ```
 
-Then, compile your jar that contain an implementation of the `ITransform` interface. 
+This `mvn` command will generate a jar file named `kafka-etl-core-1.0.0-SNAPSHOT.jar`.
 
-In order to test quickly, you could use the default implementation that doesn't do anything but log a trace, which is present in the `kafka-etl-core` artifact.
+Then, compile your jar containing an implementation of the `ITransform` interface. 
 
-In this case, the previous `mvn` command has also generate a jar file which is named `kafka-etl-core-1.0.0-SNAPSHOT.jar`
+In order to facilitate testing, you could use the default implementation that only but logs its inout, which can be found under the `kafka-etl-core` artifact.
 
 ## Test with docker-compose (development environment)
 
 ### Run kafka and zookeeper
 
-1. Check in the `docker-compose.yml` the topics that will be created inside the kafka container, for example:
+1. Inside the `docker-compose.yml`, configure the topics to be created inside the kafka container, as follows:
 
 ```
 KAFKA_CREATE_TOPICS: "IN:10:1,OUT:10:1"
 ```
 
-The values must be the same as the `topic.input` and `topic.output` entries in the JSON configuration file:
+The topic names must correspond to the `topic.input` and `topic.output` entries in the JSON configuration file:
 
 ```json
 {
@@ -86,7 +86,7 @@ The values must be the same as the `topic.input` and `topic.output` entries in t
 }
 ```
 
-The format in the is the following:
+Their format is as follows:
 
 ```
 topic_name:number_of_partitions:number_of_replicas
@@ -101,7 +101,7 @@ $ docker-compose up etl_kafka
 
 ### Run the ETL
 
-1. Check the ip inside the docker network of the `etl_kafka` container, then replace it in the JSON configuration file:
+1. Configure the JSON file to contain the ip of the of the `etl_kafka` container inside your docker network. Alternatively, these entries reference your input and output brokers.
 
 ```json
 {
@@ -110,7 +110,7 @@ $ docker-compose up etl_kafka
 }
 ```
 
-2. Replace in the `docker-compose.yml`, the jar that contain your implementation of the `ITransform` interface:
+2. Update in the `docker-compose.yml` to include the jar containing your `ITransform` interface implementation by replacing the `./kafka-etl/kafka-etl-core/target/kafka-etl-core-1.0.0-SNAPSHOT.jar` with that of your implementation :
 
 ```yaml
 volumes:
@@ -119,8 +119,6 @@ volumes:
   - ./kafka-etl/kafka-etl-core/target/kafka-etl-core-1.0.0-SNAPSHOT.jar:/transformer.jar:z
 command: /bin/bash -c "java -jar /kafka-etl-runnable.jar -conf /config.json -classpath /transformer.jar:* && while true; do echo \"debug with 'docker exec -it etl_run bash'\"; sleep 20; done"
 ```
-
-You need to replace the `./kafka-etl/kafka-etl-core/target/kafka-etl-core-1.0.0-SNAPSHOT.jar` path by your own jar file if you want to use your implementation.
 
 3. Start the container
 
@@ -134,7 +132,7 @@ $ docker-compose up etl_run
 Follow the previous section but:
 - skip the kafka and zookeeper part (we will assume that you already have your kafka brokers installed in production);
 - replace the ips by your kafka production hostnames in the JSON configuration file;
-- make another `docker-compose.yml` file that only contain:
+- make another `docker-compose.yml` file that only contain the following :
 
 ```yaml
 version: "2"
@@ -153,7 +151,7 @@ services:
 
 Replace the `kafka-etl-core-1.0.0-SNAPSHOT.jar` jar file by your own jar implementing `ITransform` interface.
 
-You can also use another JSON configuration file that will be manage by something like puppet/chef/ansible (you need to change the volume path if it's the case).
+Optionally, you can also use another JSON configuration file managed by something like puppet/chef/ansible (you will also need to change the volume path if it's the case).
 
 ## Troubleshooting
 
