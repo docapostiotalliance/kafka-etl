@@ -14,7 +14,8 @@ Here is a sample of configuration file:
   "kafka.request.timeout": 95000,
   "kafka.fetch.retries": 3,
   "transformer.class": "org.kafka.etl.transform.impl.DefaultTransform",
-  "avro.json.schema.path": "/home/ineumann/my-schema.json",
+  "transformer.jar.path": "/transformer.jar",
+  "avro.json.schema.path": "/my-schema.json",
   "group.id": "etl",
   "topic.input": "IN",
   "topic.output": "OUT",
@@ -28,6 +29,7 @@ Here is a sample of configuration file:
 * `kafka.consumer.hosts`: input broker (host and port pair) that contain the input topic;
 * `kafka.producer.hosts`: output broker (host and port pair) that hosts the output topic;
 * `transformer.class`: the name of the transformer class (for more details in the next section);
+* `transformer.jar.path`: the path of an external jar file that contain your transformer rules class;
 * `topic.input`: input topic name;
 * `topic.output`: output topic name;
 * `group.id`: group id of the consumer hosting the input topic;
@@ -117,7 +119,7 @@ volumes:
   - ./kafka-etl/kafka-etl-run/src/main/resources/configuration.json:/config.json:z
   - ./kafka-etl/kafka-etl-run/target/kafka-etl-run-runnable.jar:/kafka-etl-runnable.jar:z
   - ./kafka-etl/kafka-etl-core/target/kafka-etl-core-1.0.0-SNAPSHOT.jar:/transformer.jar:z
-command: /bin/bash -c "java -jar /kafka-etl-runnable.jar -conf /config.json -classpath /transformer.jar:* && while true; do echo \"debug with 'docker exec -it etl_run bash'\"; sleep 20; done"
+command: /bin/bash -c "java -jar /kafka-etl-runnable.jar -conf /config.json && while true; do echo \"debug with 'docker exec -it etl_run bash'\"; sleep 20; done"
 ```
 
 3. Start the container
@@ -146,7 +148,7 @@ services:
       - ./kafka-etl/kafka-etl-run/src/main/resources/configuration.json:/config.json:z
       - ./kafka-etl/kafka-etl-run/target/kafka-etl-run-runnable.jar:/kafka-etl-runnable.jar:z
       - ./kafka-etl/kafka-etl-core/target/kafka-etl-core-1.0.0-SNAPSHOT.jar:/transformer.jar:z
-    command: /bin/bash -c "java -jar /kafka-etl-runnable.jar -conf /config.json -classpath /transformer.jar:* && while true; do echo \"debug with 'docker exec -it etl_run bash'\"; sleep 20; done"
+    command: /bin/bash -c "java -jar /kafka-etl-runnable.jar -conf /config.json && while true; do echo \"debug with 'docker exec -it etl_run bash'\"; sleep 20; done"
 ```
 
 Replace the `kafka-etl-core-1.0.0-SNAPSHOT.jar` jar file by your own jar implementing `ITransform` interface.

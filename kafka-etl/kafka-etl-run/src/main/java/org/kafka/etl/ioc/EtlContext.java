@@ -2,6 +2,9 @@ package org.kafka.etl.ioc;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.Optional;
 
 import com.google.inject.AbstractModule;
@@ -49,6 +52,7 @@ public class EtlContext extends AbstractModule {
   private static final String KAFKA_FETCH_RETRIES = "kafka.fetch.retries";
 
   private static final String KEY_TRANSFORMER = "transformer.class";
+  private static final String KEY_TRANSFORM_JAR = "transformer.jar.path";
   private static final String KEY_GROUP_ID = "group.id";
   private static final String KEY_INPUT_TOPIC = "topic.input";
   private static final String KEY_OUTPUT_TOPIC = "topic.output";
@@ -107,9 +111,19 @@ public class EtlContext extends AbstractModule {
 
   private ITransform createTransformer() {
     String className = properties.getString(KEY_TRANSFORMER);
+    String jarPath = properties.getString(KEY_TRANSFORM_JAR);
 
     try {
-      Class<?> clazz = Class.forName(className);
+      Class<?> clazz = null;
+
+      if (isBlank(jarPath)) {
+        clazz = Class.forName(className);
+      } else {
+        URLClassLoader child =
+            new URLClassLoader(new URL[] {new URL(jarPath)}, this.getClass().getClassLoader());
+        clazz = Class.forName(className, true, child);
+      }
+
       Constructor<?> constructor = clazz.getConstructor();
       Object instance = constructor.newInstance();
 
@@ -122,7 +136,8 @@ public class EtlContext extends AbstractModule {
         | NoSuchMethodException
         | InstantiationException
         | IllegalAccessException
-        | InvocationTargetException e) {
+        | InvocationTargetException
+        | MalformedURLException e) {
       throw new IllegalArgumentException(String.format(MSG_ERR_INSTANCIATE_TRANSFORM_CLASS_TPL,
           className,
           e.getClass().getSimpleName(),

@@ -28,7 +28,7 @@ services:
       - ./kafka-etl/kafka-etl-run/src/main/resources/configuration.json:/config.json:z
       - ./kafka-etl/kafka-etl-run/target/kafka-etl-run-runnable.jar:/kafka-etl-runnable.jar:z
       - ./kafka-etl/kafka-etl-core/target/kafka-etl-core-1.0.0-SNAPSHOT.jar:/transformer.jar:z
-    command: /bin/bash -c "java -jar /kafka-etl-runnable.jar -conf /config.json -classpath /transformer.jar:* && while true; do echo \"debug with 'docker exec -it etl_run bash'\"; sleep 20; done"
+    command: /bin/bash -c "java -jar /kafka-etl-runnable.jar -conf /config.json && while true; do echo \"debug with 'docker exec -it etl_run bash'\"; sleep 20; done"
     depends_on:
       - etl_zoo
       - etl_kafka
