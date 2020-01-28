@@ -56,6 +56,9 @@ public interface ITransform {
 }
 ```
 
+* `input`: the data input string to transform in whatever you want;
+* `metadata`: additional informations of the original kafka message (offset number, partition number, partition key and topic name). That can be usefull in order to keep it in your own supervision system (log files, ElasticStack, Prometheus+Grafana...).
+
 # Running the project
 
 ## Build the project
