@@ -1,6 +1,6 @@
 # Kafka ETL
 
-This project aims to facilitate the copying of kafka records from one topic to another whilst transform it beforehand.
+This project aims to facilitate the copying of kafka records from one topic to another while transforming them beforehand.
 
 ## Changelog
 
