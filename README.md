@@ -178,9 +178,11 @@ Make sure to keep the [changelog.md](changelog.md) file up to date.
 
 ### Code format
 
-You have to follow the same code format as everyone else in order to have a better view of the real changes in the pull requests.
 
-To install the code formatter in your pre-commit hook, execute the following commands:
+You have to follow the same code format as everyone else in order to have a better view of the real changes in the pull requests. 
+As such, the project contains a code formatter under the root directory. 
+
+To install it, run the following command : 
 
 ```bash
 $ cd ~/kafka-etl/code-formatter
@@ -190,5 +192,5 @@ $ ./installPreCommit.sh
 ### Continuous integration
 
 Please be sure to keep the pipeline in an ok state (maven compile ok and unit tests ok) when you submit a pull request.
-You can find the pipelines are [here](https://github.com/docapostiotalliance/kafka-etl/actions).
+You can find the pipelines [here](https://github.com/docapostiotalliance/kafka-etl/actions).
 
