@@ -170,15 +170,15 @@ root@94374f0953cd:/# apt-get update -y; apt-get install dnsutils telnet net-tool
 
 ## Contributions / pull requests
 
-Please, if you want to submit some pull requests, be sure to meet the following requirements.
+In order to submit a pull request, make sure that you meet the following requirements.
 
 ### Changelog
 
-Please keep the [changelog.md](changelog.md) file up to date.
+Make sure to keep the [changelog.md](changelog.md) file up to date.
 
 ### Code format
 
-You have to follow the same code format in order to have a better view of the real changes in the pull requests.
+You have to follow the same code format as everyone else in order to have a better view of the real changes in the pull requests.
 
 To install the code formatter in your pre-commit hook, execute the following commands:
 
@@ -190,5 +190,5 @@ $ ./installPreCommit.sh
 ### Continuous integration
 
 Please be sure to keep the pipeline in an ok state (maven compile ok and unit tests ok) when you submit a pull request.
-The pipelines are [here](https://github.com/docapostiotalliance/kafka-etl/actions).
+You can find the pipelines are [here](https://github.com/docapostiotalliance/kafka-etl/actions).
 
