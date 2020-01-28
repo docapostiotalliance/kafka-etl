@@ -2,6 +2,10 @@
 
 This project aims to facilitate the copying of kafka records from one topic to another whilst transform it beforehand.
 
+## Changelog
+
+See [changelog.md](changelog.md).
+
 ## Configuration description
 
 Here is a sample of configuration file:
@@ -162,4 +166,14 @@ Optionally, you can also use another JSON configuration file managed by somethin
 ```bash
 $ docker exec -it etl_run bash
 root@94374f0953cd:/# apt-get update -y; apt-get install dnsutils telnet net-tools vim nmap -y
+```
+
+## Contributing
+
+Please, if you want to submit some pull requests, be sure to have install the java code formatter before.
+To install the code formatter in your pre-commit hook, execute the following commands:
+
+```bash
+$ cd ~/kafka-etl/code-formatter
+$ ./installPreCommit.sh
 ```
