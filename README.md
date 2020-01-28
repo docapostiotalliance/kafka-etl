@@ -168,7 +168,7 @@ $ docker exec -it etl_run bash
 root@94374f0953cd:/# apt-get update -y; apt-get install dnsutils telnet net-tools vim nmap -y
 ```
 
-## Contributing
+## Contributions / pull requests
 
 Please, if you want to submit some pull requests, be sure to meet the following requirements.
 
@@ -186,3 +186,9 @@ To install the code formatter in your pre-commit hook, execute the following com
 $ cd ~/kafka-etl/code-formatter
 $ ./installPreCommit.sh
 ```
+
+### Continuous integration
+
+Please be sure to keep the pipeline in an ok state (maven compile ok and unit tests ok) when you submit a pull request.
+The pipelines are [here](https://github.com/docapostiotalliance/kafka-etl/actions).
+
