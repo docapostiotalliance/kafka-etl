@@ -65,6 +65,9 @@ public class EtlContext extends AbstractModule {
   private static final String MSG_ERR_INSTANCIATE_TRANSFORM_CLASS_TPL =
       "Error when trying to instanciate %s : e.type = %s, e.msg = %s";
 
+
+  private static final String FILE_URL_PREFIX = "file:";
+
   private Vertx vertx;
   private JsonObject properties;
 
@@ -119,8 +122,9 @@ public class EtlContext extends AbstractModule {
       if (isBlank(jarPath)) {
         clazz = Class.forName(className);
       } else {
+        String jarUrl = jarPath.startsWith(FILE_URL_PREFIX) ? jarPath : FILE_URL_PREFIX + jarPath;
         URLClassLoader child =
-            new URLClassLoader(new URL[] {new URL(jarPath)}, this.getClass().getClassLoader());
+            new URLClassLoader(new URL[] {new URL(jarUrl)}, this.getClass().getClassLoader());
         clazz = Class.forName(className, true, child);
       }
 
