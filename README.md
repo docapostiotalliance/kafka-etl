@@ -52,7 +52,7 @@ In order to be able to create a data transformer, you need to include the `kafka
 package org.kafka.etl.transform;
 
 public interface ITransform {
-  String transform(String input);
+  String transform(String input, Map<String, String> metadata);
 }
 ```
 
