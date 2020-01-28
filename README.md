@@ -170,7 +170,16 @@ root@94374f0953cd:/# apt-get update -y; apt-get install dnsutils telnet net-tool
 
 ## Contributing
 
-Please, if you want to submit some pull requests, be sure to have install the java code formatter before.
+Please, if you want to submit some pull requests, be sure to meet the following requirements.
+
+### Changelog
+
+Please keep the [changelog.md](changelog.md) file up to date.
+
+### Code format
+
+You have to follow the same code format in order to have a better view of the real changes in the pull requests.
+
 To install the code formatter in your pre-commit hook, execute the following commands:
 
 ```bash
