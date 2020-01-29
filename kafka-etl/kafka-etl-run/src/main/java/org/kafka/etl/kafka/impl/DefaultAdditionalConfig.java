@@ -1,6 +1,5 @@
 package org.kafka.etl.kafka.impl;
 
-import com.google.inject.Inject;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.kafka.etl.kafka.IAdditionalConfig;
 import org.slf4j.Logger;

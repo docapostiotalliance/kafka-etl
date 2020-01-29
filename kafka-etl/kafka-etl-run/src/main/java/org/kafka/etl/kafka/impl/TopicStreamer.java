@@ -70,33 +70,6 @@ public class TopicStreamer implements ITopicStreamer {
   private KafkaConsumer<String, String> consumer;
   private KafkaProducer<String, String> producer;
 
-
-  public TopicStreamer(IConsumerManager consumerManager,
-                       IProducerManager producerManager,
-                       ITransform transformer,
-                       IProducerCallback callback,
-                       IAdditionalConfig additionalConfig,
-                       IPartitionKeyCalculator partitionKeyCalculator,
-                       String groupId,
-                       String inputTopic,
-                       String outputTopic,
-                       Integer pollTimeout,
-                       KafkaConsumer<String, String> consumer,
-                       KafkaProducer<String, String> producer) {
-    this.consumerManager = consumerManager;
-    this.producerManager = producerManager;
-    this.transformer = transformer;
-    this.callback = callback;
-    this.additionalConfig = additionalConfig;
-    this.partitionKeyCalculator = partitionKeyCalculator;
-    this.groupId = groupId;
-    this.inputTopic = inputTopic;
-    this.outputTopic = outputTopic;
-    this.pollTimeout = pollTimeout;
-    this.consumer = consumer;
-    this.producer = producer;
-  }
-
   public TopicStreamer() {
     // do nothing
   }
@@ -180,5 +153,25 @@ public class TopicStreamer implements ITopicStreamer {
         callback);
     consumer.commitSync(Collections.singletonMap(eventKafkaInfos.getTopicPartition(),
         new OffsetAndMetadata(eventKafkaInfos.getOffset() + 1)));
+  }
+
+  public TopicStreamer setGroupId(String groupId) {
+    this.groupId = groupId;
+    return this;
+  }
+
+  public TopicStreamer setInputTopic(String inputTopic) {
+    this.inputTopic = inputTopic;
+    return this;
+  }
+
+  public TopicStreamer setOutputTopic(String outputTopic) {
+    this.outputTopic = outputTopic;
+    return this;
+  }
+
+  public TopicStreamer setPollTimeout(Integer pollTimeout) {
+    this.pollTimeout = pollTimeout;
+    return this;
   }
 }

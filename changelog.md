@@ -13,3 +13,7 @@
 #### 1.0
 
 First stable and tested version in a real project.
+
+#### 1.1
+
+Clean code.

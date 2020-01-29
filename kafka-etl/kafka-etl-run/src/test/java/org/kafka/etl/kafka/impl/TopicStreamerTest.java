@@ -15,6 +15,7 @@ import org.kafka.etl.kafka.IProducerCallback;
 import org.kafka.etl.kafka.IProducerManager;
 import org.kafka.etl.transform.ITransform;
 import org.kafka.etl.transform.impl.DefaultTransform;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -52,6 +53,15 @@ public class TopicStreamerTest {
   @Mock
   private IPartitionKeyCalculator partitionKeyCalculator;
 
+  @Mock
+  private KafkaConsumer<String, String> consumer;
+
+  @Mock
+  private KafkaProducer<String, String> producer;
+
+  @InjectMocks
+  private TopicStreamer topicStreamer;
+
   private String groupId = "gid";
 
   private String inputTopic = "some_topic";
@@ -60,29 +70,10 @@ public class TopicStreamerTest {
 
   private Integer pollTimeout = 2000;
 
-  @Mock
-  private KafkaConsumer<String, String> consumer;
-  @Mock
-  private KafkaProducer<String, String> producer;
-
-  private TopicStreamer topicStreamer;
-
   @Before
   public void init() {
-    MockitoAnnotations.initMocks(this);
-    // transformer = new DefaultTransform();
-    topicStreamer = new TopicStreamer(consumerManager,
-        producerManager,
-        transformer,
-        callback,
-        additionalConfig,
-        partitionKeyCalculator,
-        groupId,
-        inputTopic,
-        outputTopic,
-        pollTimeout,
-        consumer,
-        producer);
+    topicStreamer.setGroupId(groupId).setInputTopic(inputTopic).setOutputTopic(outputTopic)
+        .setPollTimeout(pollTimeout);
   }
 
   @Test
