@@ -79,9 +79,6 @@ public class FileHelper {
     }
   }
 
-  /**
-   * Private constructor => utils class.
-   */
   private FileHelper() {
     // Nothing to do.
   }

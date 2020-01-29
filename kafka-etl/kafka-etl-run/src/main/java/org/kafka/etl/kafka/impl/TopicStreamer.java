@@ -68,11 +68,8 @@ public class TopicStreamer implements ITopicStreamer {
   private Integer pollTimeout;
 
   private KafkaConsumer<String, String> consumer;
-  private KafkaProducer<String, String> producer;
 
-  public TopicStreamer() {
-    // do nothing
-  }
+  private KafkaProducer<String, String> producer;
 
   @Override
   public void startStream() {
