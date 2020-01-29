@@ -78,6 +78,7 @@ public class TopicStreamerTest {
 
   @Test
   public void test_ok() {
+    // given
     String outputRecord = "foo bar";
     List<ConsumerRecord<String, String>> recordList = new ArrayList<>();
     ConsumerRecord<String, String> consumerRecord =
@@ -90,8 +91,10 @@ public class TopicStreamerTest {
 
     when(transformer.transform(eq("bar"), any())).thenReturn(outputRecord);
 
+    // when
     topicStreamer.processEvents(consumerRecords, partition);
 
+    // then
     verify(partitionKeyCalculator).generatePartitionKey("foo", outputRecord);
 
     verify(producerManager, atLeastOnce()).sendEvent(eq(producer),

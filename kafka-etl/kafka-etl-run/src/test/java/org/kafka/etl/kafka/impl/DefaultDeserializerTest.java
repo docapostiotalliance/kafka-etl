@@ -15,34 +15,36 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DefaultDeserializerTest {
+  private StringDeserializer deserializer;
 
-    @Mock
-    private StringDeserializer deserializer;
+  @Before
+  public void start() {
+    deserializer = new StringDeserializer();
+  }
 
-    @Before
-    public void start() {
-        MockitoAnnotations.initMocks(this);
-    }
+  @Test
+  public void testNullData() {
+    // given
+    byte[] data = null;
+    String topic = "test_topic";
 
-    @Test
-    public void testNullData() {
-        byte[] data = null;
-        String topic = "test_topic";
+    // when
+    String output = deserializer.deserialize(topic, data);
 
-        String output = deserializer.deserialize(topic, data);
+    // then
+    assertThat(output).isNull();
+  }
 
-        assertThat(output).isNull();
-    }
+  @Test
+  public void testNonNullData() {
+    // given
+    byte[] data = new byte[] {0};
+    String topic = "test_topic";
 
-    @Test
-    public void testNonNullData() {
-        byte[] data = new byte[]{0};
-        String topic = "test_topic";
+    // when
+    String output = deserializer.deserialize(topic, data);
 
-        when(deserializer.deserialize(anyString(), any())).thenReturn("data");
-
-        String output = deserializer.deserialize(topic, data);
-
-        assertThat(output).isNotNull();
-    }
+    // then
+    assertThat(output).isNotNull();
+  }
 }
