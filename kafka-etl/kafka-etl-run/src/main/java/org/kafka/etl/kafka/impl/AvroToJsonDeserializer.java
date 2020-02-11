@@ -46,9 +46,8 @@ public class AvroToJsonDeserializer implements IDeserializer {
     try {
       LOGGER.debug(
           "[AvroToJsonDeserializer][deserialize] Initializing data reader from Avro schema!");
-      BinaryDecoder decoder = DecoderFactory.get().binaryDecoder(
-          new ByteArrayInputStream(Arrays.copyOfRange(data, dataBytesStartOffset, data.length - 1)),
-          null);
+      BinaryDecoder decoder = DecoderFactory.get()
+          .binaryDecoder(new ByteArrayInputStream(stripFirstOffsets(data)), null);
       return JsonUtils.toJson(reader.read(null, decoder));
     } catch (Exception e) {
       LOGGER.error(
@@ -57,6 +56,10 @@ public class AvroToJsonDeserializer implements IDeserializer {
           e.getMessage());
       throw new IllegalArgumentException(e);
     }
+  }
+
+  public byte[] stripFirstOffsets(byte[] data) {
+    return Arrays.copyOfRange(data, dataBytesStartOffset, data.length);
   }
 
   @Override

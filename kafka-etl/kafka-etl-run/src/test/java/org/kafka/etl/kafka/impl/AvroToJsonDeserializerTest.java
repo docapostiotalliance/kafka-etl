@@ -19,7 +19,7 @@ public class AvroToJsonDeserializerTest {
   public void init() throws IOException {
     String schema = TestUtils.getStringFromResourceFile("/avro_schema.json");
 
-    avroToJsonDeserializer_noSchema = new AvroToJsonDeserializer(schema, 0);
+    avroToJsonDeserializer_noSchema = new AvroToJsonDeserializer(schema, 10);
   }
 
   @Test
@@ -33,6 +33,19 @@ public class AvroToJsonDeserializerTest {
 
     // then
     assertThat(output).isNull();
+  }
+
+  @Test
+  public void test_stripFirstOffsets() {
+    // given
+    byte[] data = "thisis1010 test test".getBytes();
+
+    // when
+    byte[] output = avroToJsonDeserializer_noSchema.stripFirstOffsets(data);
+
+    // then
+    assertThat(output).isNotNull().hasSize(data.length - 10);
+    assertThat(new String(output)).isEqualTo(" test test");
   }
 
   @Test(expected = IllegalArgumentException.class)
