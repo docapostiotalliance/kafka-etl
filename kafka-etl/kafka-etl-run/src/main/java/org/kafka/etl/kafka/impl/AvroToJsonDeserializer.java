@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
+import java.util.Arrays;
 import java.util.Map;
 
 public class AvroToJsonDeserializer implements IDeserializer {
@@ -18,9 +19,11 @@ public class AvroToJsonDeserializer implements IDeserializer {
 
   public final Schema schema;
   private final DatumReader<?> reader;
+  private final Integer dataBytesStartOffset;
 
-  public AvroToJsonDeserializer(String jsonSchema) {
+  public AvroToJsonDeserializer(String jsonSchema, Integer dataBytesStartOffset) {
     this.schema = new Schema.Parser().parse(jsonSchema);
+    this.dataBytesStartOffset = dataBytesStartOffset;
     reader = new ReflectDatumReader<>(schema);
   }
 
@@ -43,8 +46,9 @@ public class AvroToJsonDeserializer implements IDeserializer {
     try {
       LOGGER.debug(
           "[AvroToJsonDeserializer][deserialize] Initializing data reader from Avro schema!");
-      BinaryDecoder decoder =
-          DecoderFactory.get().binaryDecoder(new ByteArrayInputStream(data), null);
+      BinaryDecoder decoder = DecoderFactory.get().binaryDecoder(
+          new ByteArrayInputStream(Arrays.copyOfRange(data, dataBytesStartOffset, data.length - 1)),
+          null);
       return JsonUtils.toJson(reader.read(null, decoder));
     } catch (Exception e) {
       LOGGER.error(

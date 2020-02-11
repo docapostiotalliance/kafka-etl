@@ -58,6 +58,7 @@ public class EtlContext extends AbstractModule {
   private static final String KEY_OUTPUT_TOPIC = "topic.output";
   private static final String KEY_POLL_TIMEOUT = "poll.timeout";
   private static final String KEY_CONSUMER_RECORD_SIZE = "consumer.record.size";
+  private static final String KEY_AVRO_DATA_BYTES_START_OFFSET = "avro.data.bytes.start.offset";
   private static final String KEY_PRODUCER_RECORD_SIZE = "producer.record.size";
   private static final String KEY_JSON_AVRO_SCHEMA = "avro.json.schema.path";
 
@@ -184,13 +185,15 @@ public class EtlContext extends AbstractModule {
 
     Integer producerRecordSize = properties.getInteger(KEY_PRODUCER_RECORD_SIZE);
     Integer consumerRecordSize = properties.getInteger(KEY_CONSUMER_RECORD_SIZE);
+    Integer avroDataBytesStartOffset = properties.getInteger(KEY_AVRO_DATA_BYTES_START_OFFSET, 0);
     IAdditionalConfig config = new DefaultAdditionalConfig.Builder()
         .consumerRecordSize(consumerRecordSize).producerRecordSize(producerRecordSize).build();
     bind(IAdditionalConfig.class).toInstance(config);
     bind(IProducerManager.class).toInstance(createProducerManager(config));
     Optional<String> avroSchema = searchAvroSchema();
     bind(IConsumerManager.class).toInstance(createConsumerManager(new DefaultDeserializer(),
-        avroSchema.isPresent() ? new AvroToJsonDeserializer(avroSchema.get())
+        avroSchema.isPresent()
+            ? new AvroToJsonDeserializer(avroSchema.get(), avroDataBytesStartOffset)
             : new DefaultDeserializer()));
     bind(ITransform.class).toInstance(createTransformer());
     bind(IProducerCallback.class).to(DefaultProducerCallback.class);

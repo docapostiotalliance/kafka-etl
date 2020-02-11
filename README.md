@@ -26,7 +26,8 @@ Here is a sample of configuration file:
   "poll.timeout": 1000,
   "poll.size": 10,
   "consumer.record.size": 4194304,
-  "producer.record.size": 4194304
+  "producer.record.size": 4194304,
+  "avro.data.bytes.start.offset": 10
 }
 ```
 
@@ -39,8 +40,9 @@ Here is a sample of configuration file:
 * `group.id`: group id of the consumer hosting the input topic;
 * `poll.size`: number of records to are read and commit in one loop;
 * `consumer.record.size`: max size of a record that will be consumed in the input topic;
-* `producer.record.size`: max size of a record that will be produced in the output topic.
-* `avro.json.schema.path`: (optional): path to a json file that contain the avro schema to unserialize data.
+* `producer.record.size`: max size of a record that will be produced in the output topic;
+* `avro.json.schema.path`: (optional): path to a json file that contain the avro schema to unserialize data;
+* `avro.data.bytes.start.offset`: (optional): start offset to decode with avro schema (to skip the first bytes that contain the schema id).
 
 ## Implementation of the transformations rules
 
