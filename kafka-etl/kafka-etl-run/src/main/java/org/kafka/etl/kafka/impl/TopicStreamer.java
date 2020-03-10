@@ -7,6 +7,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.common.KafkaException;
 import org.apache.kafka.common.TopicPartition;
 import org.kafka.etl.kafka.IAdditionalConfig;
 import org.kafka.etl.kafka.IConsumerManager;
@@ -25,6 +26,8 @@ import java.util.List;
 import java.util.Map;
 
 import static java.util.Objects.requireNonNull;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.kafka.etl.ioc.BindedConstants.GROUP_ID;
 import static org.kafka.etl.ioc.BindedConstants.INPUT_TOPIC;
 import static org.kafka.etl.ioc.BindedConstants.OUTPUT_TOPIC;
@@ -119,7 +122,24 @@ public class TopicStreamer implements ITopicStreamer {
   }
 
   private void processPartitions() {
-    ConsumerRecords<String, String> records = consumer.poll(pollTimeout);
+    ConsumerRecords<String, String> records;
+    try {
+      records = consumer.poll(pollTimeout);
+    } catch (KafkaException e) {
+      LOGGER.warn(
+          "[TopicStreamer][processPartitions] encounter an error when polling data, e.type = {}, e.msg = {}, e.cause.type = {}, e.cause.msg = {}",
+          e.getClass().getSimpleName(),
+          e.getMessage(),
+          null == e.getCause() ? EMPTY : e.getCause().getClass().getSimpleName(),
+          null == e.getCause() ? EMPTY : e.getCause().getMessage());
+      return;
+    }
+
+    if (null == records) {
+      LOGGER.warn("[TopicStreamer][processPartitions] encounter a null set of records from poll");
+      return;
+    }
+
     LOGGER.debug(
         "[TopicStreamer][processPartitions] processing records : count = {}, partitions = {}",
         records.count(),
@@ -129,9 +149,11 @@ public class TopicStreamer implements ITopicStreamer {
 
   public void processEvents(ConsumerRecords partitionRecords, TopicPartition partition) {
     List<ConsumerRecord<String, String>> records = partitionRecords.records(partition);
-    records.stream().forEach(record -> processMessage(record.key(),
-        record.value(),
-        new EventKafkaInfos.Builder().offset(record.offset()).topicPartirion(partition).build()));
+    records.stream().filter(r -> isNotBlank(r.key()) && isNotBlank(r.value()))
+        .forEach(record -> processMessage(record.key(),
+            record.value(),
+            new EventKafkaInfos.Builder().offset(record.offset()).topicPartirion(partition)
+                .build()));
   }
 
   private void processMessage(String originalKey, String event, EventKafkaInfos eventKafkaInfos) {
