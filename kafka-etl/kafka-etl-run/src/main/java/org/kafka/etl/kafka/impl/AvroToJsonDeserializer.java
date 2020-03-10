@@ -48,7 +48,9 @@ public class AvroToJsonDeserializer implements IDeserializer {
           "[AvroToJsonDeserializer][deserialize] Initializing data reader from Avro schema!");
       BinaryDecoder decoder = DecoderFactory.get()
           .binaryDecoder(new ByteArrayInputStream(stripFirstOffsets(data)), null);
-      return JsonUtils.toJson(reader.read(null, decoder));
+      Object decodedValue = reader.read(null, decoder);
+      return decodedValue instanceof String && JsonUtils.isValid((String) decodedValue)
+          ? (String) decodedValue : JsonUtils.toJson(decodedValue);
     } catch (Exception e) {
       LOGGER.error(
           "AvroToJsonDeserializer][deserialize] Error while deserializing data, e.type = {}, e.msg = {}",

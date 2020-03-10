@@ -23,6 +23,9 @@
     <avro.version>1.8.2</avro.version>
     <vertx.version>3.4.1</vertx.version>
     <guice.version>4.1.0</guice.version>
+    <mockito.version>1.9.5</mockito.version>
+    <junit.version>4.12</junit.version>
+    <assertj-core.version>3.4.1</assertj-core.version>
   </properties>
 
   <modules>

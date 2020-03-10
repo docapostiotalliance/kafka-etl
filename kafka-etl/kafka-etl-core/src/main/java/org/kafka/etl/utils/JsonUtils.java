@@ -12,6 +12,8 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import java.io.IOException;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
 public final class JsonUtils {
   public static final ObjectMapper MAPPER = initObjectMapper();
 
@@ -41,6 +43,24 @@ public final class JsonUtils {
       String msg = "Error convert to json from object " + o.toString();
       throw new IllegalStateException(msg, ioe);
     }
+  }
+
+  public static boolean isValid(final String json, final ObjectMapper mapper) {
+    if (isBlank(json)) {
+      return false;
+    }
+
+    try {
+      mapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+      mapper.readTree(json);
+      return true;
+    } catch (IOException e) {
+      return false;
+    }
+  }
+
+  public static boolean isValid(final String json) {
+    return isValid(json, MAPPER);
   }
 }
 
