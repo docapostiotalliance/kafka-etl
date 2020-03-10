@@ -27,7 +27,7 @@ Here is a sample of configuration file:
   "poll.size": 10,
   "consumer.record.size": 4194304,
   "producer.record.size": 4194304,
-  "avro.data.bytes.start.offset": 10
+  "avro.data.bytes.start.offset": 5
 }
 ```
 
