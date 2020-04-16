@@ -2,10 +2,6 @@
 
 This project aims to facilitate the copying of kafka records from one topic to another while transforming them beforehand.
 
-## Changelog
-
-See [changelog.md](changelog.md).
-
 ## Configuration description
 
 Here is a sample of configuration file:
@@ -27,7 +23,7 @@ Here is a sample of configuration file:
   "poll.size": 10,
   "consumer.record.size": 4194304,
   "producer.record.size": 4194304,
-  "avro.data.bytes.start.offset": 5
+  "avro.data.bytes.start.offset": 10
 }
 ```
 

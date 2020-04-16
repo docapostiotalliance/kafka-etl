@@ -6,15 +6,12 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.consumer.OffsetAndMetadata;
-import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.common.KafkaException;
 import org.apache.kafka.common.TopicPartition;
 import org.kafka.etl.kafka.IAdditionalConfig;
 import org.kafka.etl.kafka.IConsumerManager;
-import org.kafka.etl.kafka.IPartitionKeyCalculator;
-import org.kafka.etl.kafka.IProducerCallback;
-import org.kafka.etl.kafka.IProducerManager;
 import org.kafka.etl.kafka.ITopicStreamer;
+import org.kafka.etl.load.ILoad;
 import org.kafka.etl.transform.ITransform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,19 +37,13 @@ public class TopicStreamer implements ITopicStreamer {
   private IConsumerManager consumerManager;
 
   @Inject
-  private IProducerManager producerManager;
-
-  @Inject
   private ITransform transformer;
-
-  @Inject
-  private IProducerCallback callback;
 
   @Inject
   private IAdditionalConfig additionalConfig;
 
   @Inject
-  private IPartitionKeyCalculator partitionKeyCalculator;
+  private ILoad loader;
 
   @Inject
   @Named(GROUP_ID)
@@ -63,16 +54,10 @@ public class TopicStreamer implements ITopicStreamer {
   private String inputTopic;
 
   @Inject
-  @Named(OUTPUT_TOPIC)
-  private String outputTopic;
-
-  @Inject
   @Named(POLL_TIMEOUT)
   private Integer pollTimeout;
 
   private KafkaConsumer<String, String> consumer;
-
-  private KafkaProducer<String, String> producer;
 
   @Override
   public void startStream() {
@@ -89,11 +74,9 @@ public class TopicStreamer implements ITopicStreamer {
           e);
     } finally {
       LOGGER.info(
-          "[TopicStreamer][processQueueQuietly] Closing consumer and producer : consumer.subscription = {}",
+          "[TopicStreamer][processQueueQuietly] Closing consumer and loader : consumer.subscription = {}",
           null == consumer ? null : consumer.subscription());
-      if (null != producer) {
-        producer.close();
-      }
+      loader.close();
 
       if (null != consumer) {
         consumer.close();
@@ -105,7 +88,6 @@ public class TopicStreamer implements ITopicStreamer {
     consumer = requireNonNull(consumerManager.getConsumer(groupId,
         inputTopic,
         additionalConfig.consumerAdditionalConfig()), "consumer must not be null");
-    producer = requireNonNull(producerManager.getProducer(), "producer must not be null");
   }
 
   private void processQueue() {
@@ -165,11 +147,7 @@ public class TopicStreamer implements ITopicStreamer {
     metadata.put("partition", String.valueOf(eventKafkaInfos.getPartition()));
     metadata.put("key", originalKey);
     String transformed = transformer.transform(event, metadata);
-    producerManager.sendEvent(producer,
-        partitionKeyCalculator.generatePartitionKey(originalKey, transformed),
-        transformed,
-        inputTopic,
-        callback);
+    loader.loadEvent(originalKey, transformed);
     consumer.commitSync(Collections.singletonMap(eventKafkaInfos.getTopicPartition(),
         new OffsetAndMetadata(eventKafkaInfos.getOffset() + 1)));
   }
@@ -184,13 +162,12 @@ public class TopicStreamer implements ITopicStreamer {
     return this;
   }
 
-  public TopicStreamer setOutputTopic(String outputTopic) {
-    this.outputTopic = outputTopic;
-    return this;
-  }
-
   public TopicStreamer setPollTimeout(Integer pollTimeout) {
     this.pollTimeout = pollTimeout;
     return this;
+  }
+
+  public ILoad getLoader() {
+    return loader;
   }
 }

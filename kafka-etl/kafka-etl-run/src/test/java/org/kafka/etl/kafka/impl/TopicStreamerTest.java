@@ -13,11 +13,14 @@ import org.kafka.etl.kafka.IConsumerManager;
 import org.kafka.etl.kafka.IPartitionKeyCalculator;
 import org.kafka.etl.kafka.IProducerCallback;
 import org.kafka.etl.kafka.IProducerManager;
+import org.kafka.etl.load.ILoad;
+import org.kafka.etl.load.KafkaLoader;
 import org.kafka.etl.transform.ITransform;
 import org.kafka.etl.transform.impl.DefaultTransform;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.ArrayList;
@@ -56,6 +59,10 @@ public class TopicStreamerTest {
   @Mock
   private KafkaConsumer<String, String> consumer;
 
+  @Spy
+  @InjectMocks
+  private ILoad loader = new KafkaLoader();
+
   @Mock
   private KafkaProducer<String, String> producer;
 
@@ -72,12 +79,12 @@ public class TopicStreamerTest {
 
   @Before
   public void init() {
-    topicStreamer.setGroupId(groupId).setInputTopic(inputTopic).setOutputTopic(outputTopic)
-        .setPollTimeout(pollTimeout);
+    topicStreamer.setGroupId(groupId).setInputTopic(inputTopic).setPollTimeout(pollTimeout);
+    ((KafkaLoader) topicStreamer.getLoader()).setOutputTopic(outputTopic);
   }
 
   @Test
-  public void test_ok() {
+  public void testProcessEvents_withKafkaLoader() {
     // given
     String outputRecord = "foo bar";
     List<ConsumerRecord<String, String>> recordList = new ArrayList<>();
@@ -100,7 +107,7 @@ public class TopicStreamerTest {
     verify(producerManager, atLeastOnce()).sendEvent(eq(producer),
         any(),
         eq("foo bar"),
-        eq(inputTopic),
+        eq(outputTopic),
         eq(callback));
   }
 

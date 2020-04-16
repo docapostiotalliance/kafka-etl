@@ -28,6 +28,8 @@ import org.kafka.etl.kafka.impl.DefaultPartitionKeyCalculator;
 import org.kafka.etl.kafka.impl.DefaultProducerCallback;
 import org.kafka.etl.kafka.impl.ProducerManager;
 import org.kafka.etl.kafka.impl.TopicStreamer;
+import org.kafka.etl.load.ILoad;
+import org.kafka.etl.load.KafkaLoader;
 import org.kafka.etl.transform.ITransform;
 import org.kafka.etl.utils.FileHelper;
 import org.slf4j.Logger;
@@ -36,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.kafka.etl.ioc.BindedConstants.GROUP_ID;
 import static org.kafka.etl.ioc.BindedConstants.INPUT_TOPIC;
 import static org.kafka.etl.ioc.BindedConstants.OUTPUT_TOPIC;
@@ -178,8 +181,10 @@ public class EtlContext extends AbstractModule {
     bindConstant().annotatedWith(Names.named(GROUP_ID)).to(properties.getString(KEY_GROUP_ID));
     bindConstant().annotatedWith(Names.named(INPUT_TOPIC))
         .to(properties.getString(KEY_INPUT_TOPIC));
-    bindConstant().annotatedWith(Names.named(OUTPUT_TOPIC))
-        .to(properties.getString(KEY_OUTPUT_TOPIC));
+    String outputTopic = properties.getString(KEY_OUTPUT_TOPIC);
+    if (isNotBlank(outputTopic)) {
+      bindConstant().annotatedWith(Names.named(OUTPUT_TOPIC)).to(outputTopic);
+    }
     bindConstant().annotatedWith(Names.named(POLL_TIMEOUT))
         .to(properties.getInteger(KEY_POLL_TIMEOUT));
 
@@ -198,6 +203,11 @@ public class EtlContext extends AbstractModule {
     bind(ITransform.class).toInstance(createTransformer());
     bind(IProducerCallback.class).to(DefaultProducerCallback.class);
     bind(IPartitionKeyCalculator.class).to(DefaultPartitionKeyCalculator.class);
+    if (isNotBlank(outputTopic)) {
+      bind(ILoad.class).to(KafkaLoader.class);
+    } else {
+      bind(ILoad.class).toInstance(new ILoad.Default());
+    }
     bind(ITopicStreamer.class).to(TopicStreamer.class);
   }
 }
