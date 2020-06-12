@@ -49,11 +49,28 @@ public class AvroToJsonDeserializer implements IDeserializer {
       BinaryDecoder decoder = DecoderFactory.get()
           .binaryDecoder(new ByteArrayInputStream(stripFirstOffsets(data)), null);
       Object decodedValue = reader.read(null, decoder);
-      return decodedValue instanceof String && JsonUtils.isValid((String) decodedValue)
-          ? (String) decodedValue : JsonUtils.toJson(decodedValue);
+      String rtn = decodedValue.toString();
+
+      if (JsonUtils.isValid(rtn)) {
+        LOGGER.debug(
+            "[AvroToJsonDeserializer][deserialize] decodedValue.toString is a valid JSON String : ",
+            rtn);
+        return rtn;
+      }
+
+      if (decodedValue instanceof String && JsonUtils.isValid((String) decodedValue)) {
+        rtn = (String) decodedValue;
+        LOGGER.debug("[AvroToJsonDeserializer][deserialize] decodedValue is a valid JSON String : ",
+            rtn);
+        return rtn;
+      }
+
+      LOGGER.info(
+          "[AvroToJsonDeserializer][deserialize] neither decodedValue.toString or decodedValue are valid JSON String");
+      return JsonUtils.toJson(decodedValue);
     } catch (Exception e) {
       LOGGER.error(
-          "AvroToJsonDeserializer][deserialize] Error while deserializing data, e.type = {}, e.msg = {}",
+          "[AvroToJsonDeserializer][deserialize] Error while deserializing data, e.type = {}, e.msg = {}",
           e.getClass().getSimpleName(),
           e.getMessage());
       throw new IllegalArgumentException(e);
