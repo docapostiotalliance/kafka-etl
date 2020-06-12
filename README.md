@@ -23,7 +23,8 @@ Here is a sample of configuration file:
   "poll.size": 10,
   "consumer.record.size": 4194304,
   "producer.record.size": 4194304,
-  "avro.data.bytes.start.offset": 10
+  "avro.data.bytes.start.offset": 10,
+  "fail.on.empty.json": true
 }
 ```
 
@@ -39,6 +40,7 @@ Here is a sample of configuration file:
 * `producer.record.size`: max size of a record that will be produced in the output topic;
 * `avro.json.schema.path`: (optional): path to a json file that contain the avro schema to unserialize data;
 * `avro.data.bytes.start.offset`: (optional): start offset to decode with avro schema (to skip the first bytes that contain the schema id).
+* `fail.on.empty.json`: (optional): fail if the deserialized json from avro has all field empty (non-valid schema). Default is `true`.
 
 ## Implementation of the transformations rules
 

@@ -19,7 +19,7 @@ public class AvroToJsonDeserializerTest {
   public void init() throws IOException {
     String schema = TestUtils.getStringFromResourceFile("/avro_schema.json");
 
-    avroToJsonDeserializer_noSchema = new AvroToJsonDeserializer(schema, 10);
+    avroToJsonDeserializer_noSchema = new AvroToJsonDeserializer(schema, 10, true);
   }
 
   @Test

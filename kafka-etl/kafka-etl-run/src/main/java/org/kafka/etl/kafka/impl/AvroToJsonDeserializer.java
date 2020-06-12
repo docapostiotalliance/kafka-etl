@@ -1,5 +1,7 @@
 package org.kafka.etl.kafka.impl;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
+import io.vertx.core.json.JsonObject;
 import org.apache.avro.Schema;
 import org.apache.avro.io.BinaryDecoder;
 import org.apache.avro.io.DatumReader;
@@ -14,16 +16,22 @@ import java.io.ByteArrayInputStream;
 import java.util.Arrays;
 import java.util.Map;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 public class AvroToJsonDeserializer implements IDeserializer {
   private static final Logger LOGGER = LoggerFactory.getLogger(AvroToJsonDeserializer.class);
 
   public final Schema schema;
   private final DatumReader<?> reader;
   private final Integer dataBytesStartOffset;
+  private final boolean failOnEmptyJson;
 
-  public AvroToJsonDeserializer(String jsonSchema, Integer dataBytesStartOffset) {
+  public AvroToJsonDeserializer(String jsonSchema,
+                                Integer dataBytesStartOffset,
+                                boolean failOnEmptyJson) {
     this.schema = new Schema.Parser().parse(jsonSchema);
     this.dataBytesStartOffset = dataBytesStartOffset;
+    this.failOnEmptyJson = failOnEmptyJson;
     reader = new ReflectDatumReader<>(schema);
   }
 
@@ -55,6 +63,11 @@ public class AvroToJsonDeserializer implements IDeserializer {
         LOGGER.debug(
             "[AvroToJsonDeserializer][deserialize] decodedValue.toString is a valid JSON String : ",
             rtn);
+        if (failOnEmptyJson && isEmptyJson(rtn)) {
+          throw new IllegalStateException(
+              "[AvroToJsonDeserializer][deserialize] deserializedValue.toString is empty : " + rtn);
+        }
+
         return rtn;
       }
 
@@ -62,6 +75,12 @@ public class AvroToJsonDeserializer implements IDeserializer {
         rtn = (String) decodedValue;
         LOGGER.debug("[AvroToJsonDeserializer][deserialize] decodedValue is a valid JSON String : ",
             rtn);
+
+        if (failOnEmptyJson && isEmptyJson(rtn)) {
+          throw new IllegalStateException(
+              "[AvroToJsonDeserializer][deserialize] deserializedValue is empty : " + rtn);
+        }
+
         return rtn;
       }
 
@@ -75,6 +94,12 @@ public class AvroToJsonDeserializer implements IDeserializer {
           e.getMessage());
       throw new IllegalArgumentException(e);
     }
+  }
+
+  private boolean isEmptyJson(String json) {
+    JsonObject jo = new JsonObject(json);
+    return !jo.stream().filter(e -> null != e.getValue() && isNotBlank(e.getValue().toString()))
+        .findAny().isPresent();
   }
 
   public byte[] stripFirstOffsets(byte[] data) {
