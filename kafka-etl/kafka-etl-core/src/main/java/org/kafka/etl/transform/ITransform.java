@@ -1,7 +1,8 @@
 package org.kafka.etl.transform;
 
 import java.util.Map;
+import java.util.Optional;
 
 public interface ITransform {
-  String transform(String input, Map<String, String> metadata);
+  Optional<String> transform(String input, Map<String, String> metadata);
 }

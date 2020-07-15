@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
@@ -96,7 +97,7 @@ public class TopicStreamerTest {
     e.put(partition, Collections.singletonList(consumerRecord));
     ConsumerRecords consumerRecords = new ConsumerRecords(e);
 
-    when(transformer.transform(eq("bar"), any())).thenReturn(outputRecord);
+    when(transformer.transform(eq("bar"), any())).thenReturn(Optional.of(outputRecord));
 
     // when
     topicStreamer.processEvents(consumerRecords, partition);

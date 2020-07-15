@@ -146,8 +146,8 @@ public class TopicStreamer implements ITopicStreamer {
     metadata.put("topic", eventKafkaInfos.getTopic());
     metadata.put("partition", String.valueOf(eventKafkaInfos.getPartition()));
     metadata.put("key", originalKey);
-    String transformed = transformer.transform(event, metadata);
-    loader.loadEvent(originalKey, transformed);
+    transformer.transform(event, metadata)
+        .ifPresent(transformed -> loader.loadEvent(originalKey, transformed));
     consumer.commitSync(Collections.singletonMap(eventKafkaInfos.getTopicPartition(),
         new OffsetAndMetadata(eventKafkaInfos.getOffset() + 1)));
   }

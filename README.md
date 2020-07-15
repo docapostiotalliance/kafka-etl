@@ -51,13 +51,18 @@ In order to be able to create a data transformer, you need to include the `kafka
 ```java
 package org.kafka.etl.transform;
 
+import java.util.Map;
+import java.util.Optional;
+
 public interface ITransform {
-  String transform(String input, Map<String, String> metadata);
+  Optional<String> transform(String input, Map<String, String> metadata);
 }
 ```
 
 * `input`: the data input string to transform in whatever format you want;
 * `metadata`: additional informations of the original kafka message (offset number, partition number, partition key and topic name). That can be usefull in order to keep it in your own supervision system (log files, ElasticStack, Prometheus+Grafana...).
+
+If the implementation does return an empty `Optional`, the data will be skipped and not send to the output topic.
 
 # Running the project
 
