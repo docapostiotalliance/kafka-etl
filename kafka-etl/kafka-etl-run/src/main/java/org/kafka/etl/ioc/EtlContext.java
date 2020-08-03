@@ -6,6 +6,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Optional;
+import java.util.Properties;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
@@ -43,6 +44,7 @@ import static org.kafka.etl.ioc.BindedConstants.GROUP_ID;
 import static org.kafka.etl.ioc.BindedConstants.INPUT_TOPIC;
 import static org.kafka.etl.ioc.BindedConstants.OUTPUT_TOPIC;
 import static org.kafka.etl.ioc.BindedConstants.POLL_TIMEOUT;
+import static org.kafka.etl.utils.PropertiesUtils.fromJson;
 
 public class EtlContext extends AbstractModule {
   private static final Logger LOGGER = LoggerFactory.getLogger(EtlContext.class);
@@ -119,7 +121,10 @@ public class EtlContext extends AbstractModule {
         valueDeserializer);
   }
 
-  private ILoad createLoader(String className, String jarPath) {
+  private ILoad createLoader(JsonObject properties) {
+    String className = properties.getString(KEY_LOADER);
+    String jarPath = properties.getString(KEY_LOADER_JAR);
+
     try {
       Class<?> clazz = null;
 
@@ -140,7 +145,7 @@ public class EtlContext extends AbstractModule {
             String.format(MSG_ERR_BAD_CLASS_TPL, className, ILoad.class.getSimpleName()));
       }
 
-      return (ILoad) instance;
+      return ((ILoad) instance).init(fromJson(properties));
     } catch (ClassNotFoundException
         | NoSuchMethodException
         | InstantiationException
@@ -250,14 +255,13 @@ public class EtlContext extends AbstractModule {
     bind(IProducerCallback.class).to(DefaultProducerCallback.class);
     bind(IPartitionKeyCalculator.class).to(DefaultPartitionKeyCalculator.class);
 
-
     String loaderClassName = properties.getString(KEY_LOADER);
     String loaderJarPath = properties.getString(KEY_LOADER_JAR);
 
     if (isNotBlank(outputTopic)) {
       bind(ILoad.class).to(KafkaLoader.class);
     } else if (isNotBlank(loaderClassName) && isNotBlank(loaderJarPath)) {
-      bind(ILoad.class).toInstance(createLoader(loaderClassName, loaderJarPath));
+      bind(ILoad.class).toInstance(createLoader(properties));
     } else {
       bind(ILoad.class).toInstance(new ILoad.Default());
     }

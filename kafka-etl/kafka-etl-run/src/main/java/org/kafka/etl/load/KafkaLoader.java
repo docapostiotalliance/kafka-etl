@@ -8,6 +8,8 @@ import org.kafka.etl.kafka.IProducerManager;
 
 import javax.inject.Named;
 
+import java.util.Properties;
+
 import static org.kafka.etl.ioc.BindedConstants.OUTPUT_TOPIC;
 
 public class KafkaLoader implements ILoad {
@@ -25,6 +27,11 @@ public class KafkaLoader implements ILoad {
   private String outputTopic;
 
   private KafkaProducer<String, String> producer;
+
+  @Override
+  public ILoad init(Properties properties) {
+    return this;
+  }
 
   @Override
   public void loadEvent(String originalKey, String event) {

@@ -16,10 +16,8 @@ import org.kafka.etl.kafka.IProducerManager;
 import org.kafka.etl.load.ILoad;
 import org.kafka.etl.load.KafkaLoader;
 import org.kafka.etl.transform.ITransform;
-import org.kafka.etl.transform.impl.DefaultTransform;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 

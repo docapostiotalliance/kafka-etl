@@ -1,0 +1,8 @@
+{
+  "test": "value",
+  "testInteger": 1,
+  "testBoolean": true,
+  "testObject":  {
+    "test2": "value2"
+  }
+}

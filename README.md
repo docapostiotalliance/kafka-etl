@@ -80,6 +80,9 @@ In order to load the transformed data, you need to include the `kafka-etl-core` 
 package org.kafka.etl.load;
 
 public interface ILoad {
+  // Injecting the json configuration file content into a java.util.Properties object
+  ILoad init(Properties properties);
+
   void loadEvent(String originalKey, String event);
 
   // Close persistent TCP connections at the end
