@@ -72,7 +72,7 @@ If the implementation does return an empty `Optional`, the data will be skipped 
 
 This ETL provide a `KafkaLoader` implementation which aims to load you transformed data into an output kafka topic.
 
-But sometime you want to load the data into something else like databases, distributed caches, other message queueing systems, webservices or http endpoints... that's the point of using an ETL after all. 
+But sometimes you want to load the data into something else like databases, distributed caches, other message queueing systems, webservices or http endpoints... that's the point of using an ETL after all. 
 
 In order to load the transformed data, you need to include the `kafka-etl-core` JAR file into your dependencies and implement the following interface :
 
@@ -194,6 +194,8 @@ services:
 Replace the `kafka-etl-core-1.0.0-SNAPSHOT.jar` jar file by your own jar implementing `ITransform` interface.
 
 Optionally, you can also use another JSON configuration file managed by something like puppet/chef/ansible (you will also need to change the volume path if it's the case).
+
+If you're using your own loader implementation, don't forger to add a volume to mount your own loader jar file in the place that correspond to your `loader.jar.path` property.
 
 ## Troubleshooting
 
