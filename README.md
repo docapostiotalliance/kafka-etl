@@ -210,10 +210,6 @@ root@94374f0953cd:/# apt-get update -y; apt-get install dnsutils telnet net-tool
 
 In order to submit a pull request, make sure that you meet the following requirements.
 
-### Changelog
-
-Make sure to keep the [changelog.md](changelog.md) file up to date.
-
 ### Code format
 
 
