@@ -1,6 +1,6 @@
 # Kafka ETL
 
-This project aims to facilitate the copying of kafka records from one topic to another while transforming them beforehand.
+This project aims to facilitate the copying of kafka records from one topic to another (or something else) while transforming them beforehand.
 
 ## Configuration description
 
@@ -19,6 +19,8 @@ Here is a sample of configuration file:
   "group.id": "etl",
   "topic.input": "IN",
   "topic.output": "OUT",
+  "loader.class": "org.kafka.etl.load.impl.ElasticSearchLoader",
+  "loader.jar.path": "/loader.jar",
   "poll.timeout": 1000,
   "poll.size": 10,
   "consumer.record.size": 4194304,
@@ -33,7 +35,9 @@ Here is a sample of configuration file:
 * `transformer.class`: the name of the transformer class (for more details in the next section);
 * `transformer.jar.path`: the path of an external jar file that contain your transformer rules class;
 * `topic.input`: input topic name;
-* `topic.output`: output topic name;
+* `topic.output`: (optional): output topic name (if present, it will enable the default `KafkaLoader` that will load the data in the output topic);
+* `loader.class`: (optional): the name of the loader class (for more details in the loader section);
+* `loader.jar.path`: (optional): the path of an external jar file that contain your loader class;
 * `group.id`: group id of the consumer hosting the input topic;
 * `poll.size`: number of records to are read and commit in one loop;
 * `consumer.record.size`: max size of a record that will be consumed in the input topic;
@@ -63,6 +67,30 @@ public interface ITransform {
 * `metadata`: additional informations of the original kafka message (offset number, partition number, partition key and topic name). That can be usefull in order to keep it in your own supervision system (log files, ElasticStack, Prometheus+Grafana...).
 
 If the implementation does return an empty `Optional`, the data will be skipped and not send to the output topic.
+
+## Implementation of another Loader
+
+This ETL provide a `KafkaLoader` implementation which aims to load you transformed data into an output kafka topic.
+
+But sometime you want to load the data into something else like databases, distributed caches, other message queueing systems, webservices or http endpoints... that's the point of using an ETL after all. 
+
+In order to load the transformed data, you need to include the `kafka-etl-core` JAR file into your dependencies and implement the following interface :
+
+```java
+package org.kafka.etl.load;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public interface ILoad {
+  void loadEvent(String originalKey, String event);
+
+  // Close persistent TCP connections at the end
+  void close();
+}
+```
+
+Then, replace the `topic.output` property in your config files by `loader.class` and `loader.jar.path`.
 
 # Running the project
 

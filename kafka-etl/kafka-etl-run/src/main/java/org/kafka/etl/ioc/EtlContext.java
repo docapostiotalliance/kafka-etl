@@ -56,6 +56,8 @@ public class EtlContext extends AbstractModule {
 
   private static final String KEY_TRANSFORMER = "transformer.class";
   private static final String KEY_TRANSFORM_JAR = "transformer.jar.path";
+  private static final String KEY_LOADER = "loader.class";
+  private static final String KEY_LOADER_JAR = "loader.jar.path";
   private static final String KEY_GROUP_ID = "group.id";
   private static final String KEY_INPUT_TOPIC = "topic.input";
   private static final String KEY_OUTPUT_TOPIC = "topic.output";
@@ -66,7 +68,7 @@ public class EtlContext extends AbstractModule {
   private static final String KEY_PRODUCER_RECORD_SIZE = "producer.record.size";
   private static final String KEY_JSON_AVRO_SCHEMA = "avro.json.schema.path";
 
-  private static final String MSG_ERR_BAD_CLASS_TPL = "%s is not an instance of ITransform";
+  private static final String MSG_ERR_BAD_CLASS_TPL = "%s is not an instance of %s";
   private static final String MSG_ERR_INSTANCIATE_TRANSFORM_CLASS_TPL =
       "Error when trying to instanciate %s : e.type = %s, e.msg = %s";
 
@@ -117,6 +119,41 @@ public class EtlContext extends AbstractModule {
         valueDeserializer);
   }
 
+  private ILoad createLoader(String className, String jarPath) {
+    try {
+      Class<?> clazz = null;
+
+      if (isBlank(jarPath)) {
+        clazz = Class.forName(className);
+      } else {
+        String jarUrl = jarPath.startsWith(FILE_URL_PREFIX) ? jarPath : FILE_URL_PREFIX + jarPath;
+        URLClassLoader child =
+            new URLClassLoader(new URL[] {new URL(jarUrl)}, this.getClass().getClassLoader());
+        clazz = Class.forName(className, true, child);
+      }
+
+      Constructor<?> constructor = clazz.getConstructor();
+      Object instance = constructor.newInstance();
+
+      if (!(instance instanceof ILoad)) {
+        throw new IllegalArgumentException(
+            String.format(MSG_ERR_BAD_CLASS_TPL, className, ILoad.class.getSimpleName()));
+      }
+
+      return (ILoad) instance;
+    } catch (ClassNotFoundException
+        | NoSuchMethodException
+        | InstantiationException
+        | IllegalAccessException
+        | InvocationTargetException
+        | MalformedURLException e) {
+      throw new IllegalArgumentException(String.format(MSG_ERR_INSTANCIATE_TRANSFORM_CLASS_TPL,
+          className,
+          e.getClass().getSimpleName(),
+          e.getMessage()));
+    }
+  }
+
   private ITransform createTransformer() {
     String className = properties.getString(KEY_TRANSFORMER);
     String jarPath = properties.getString(KEY_TRANSFORM_JAR);
@@ -137,7 +174,8 @@ public class EtlContext extends AbstractModule {
       Object instance = constructor.newInstance();
 
       if (!(instance instanceof ITransform)) {
-        throw new IllegalArgumentException(String.format(MSG_ERR_BAD_CLASS_TPL, className));
+        throw new IllegalArgumentException(
+            String.format(MSG_ERR_BAD_CLASS_TPL, className, ITransform.class.getSimpleName()));
       }
 
       return (ITransform) instance;
@@ -211,11 +249,19 @@ public class EtlContext extends AbstractModule {
     bind(ITransform.class).toInstance(createTransformer());
     bind(IProducerCallback.class).to(DefaultProducerCallback.class);
     bind(IPartitionKeyCalculator.class).to(DefaultPartitionKeyCalculator.class);
+
+
+    String loaderClassName = properties.getString(KEY_LOADER);
+    String loaderJarPath = properties.getString(KEY_LOADER_JAR);
+
     if (isNotBlank(outputTopic)) {
       bind(ILoad.class).to(KafkaLoader.class);
+    } else if (isNotBlank(loaderClassName) && isNotBlank(loaderJarPath)) {
+      bind(ILoad.class).toInstance(createLoader(loaderClassName, loaderJarPath));
     } else {
       bind(ILoad.class).toInstance(new ILoad.Default());
     }
+
     bind(ITopicStreamer.class).to(TopicStreamer.class);
   }
 }
