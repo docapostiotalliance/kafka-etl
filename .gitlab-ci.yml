@@ -1,0 +1,11 @@
+stages:
+  - mirror
+
+github-mirror:
+  stage: mirror
+  script:
+    - setsid ./ci/github-mirror.sh
+  only:
+    - /^(master.*)$/
+  tags:
+    - kafka-etl

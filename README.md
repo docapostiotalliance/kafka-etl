@@ -2,6 +2,11 @@
 
 This project aims to facilitate the copying of kafka records from one topic to another (or something else) while transforming them beforehand.
 
+## Git repo
+
+* Main working repo: https://gitlab.comwork.io/oss/docapostiotalliance/kafka-etl
+* Github mirror backup: https://github.com/docapostiotalliance/kafka-etl
+
 ## Configuration description
 
 Here is a sample of configuration file:
