@@ -1,7 +1,7 @@
 stages:
   - mirror
 
-github-mirror:
+mirror:
   stage: mirror
   script:
     - setsid ./ci/mirror.sh
