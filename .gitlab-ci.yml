@@ -4,7 +4,7 @@ stages:
 github-mirror:
   stage: mirror
   script:
-    - setsid ./ci/github-mirror.sh
+    - setsid ./ci/mirror.sh
   only:
     - /^(master.*)$/
   tags:

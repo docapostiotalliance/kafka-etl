@@ -6,6 +6,7 @@ This project aims to facilitate the copying of kafka records from one topic to a
 
 * Main working repo: https://gitlab.comwork.io/oss/docapostiotalliance/kafka-etl
 * Github mirror backup: https://github.com/docapostiotalliance/kafka-etl
+* Gitlab mirror backup: https://gitlab.com/ineumann/kafka-etl
 
 ## Configuration description
 
