@@ -8,4 +8,4 @@ mirror:
   only:
     - /^(master.*)$/
   tags:
-    - kafka-etl
+    - mirror
