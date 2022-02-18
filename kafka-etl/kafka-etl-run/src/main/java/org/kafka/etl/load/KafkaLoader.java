@@ -2,7 +2,7 @@ package org.kafka.etl.load;
 
 import com.google.inject.Inject;
 import org.apache.kafka.clients.producer.KafkaProducer;
-import org.kafka.etl.kafka.IPartitionKeyCalculator;
+import org.kafka.etl.load.IPartitionKeyCalculator;
 import org.kafka.etl.kafka.IProducerCallback;
 import org.kafka.etl.kafka.IProducerManager;
 

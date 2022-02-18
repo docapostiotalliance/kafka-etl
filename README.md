@@ -24,6 +24,8 @@ Here is a sample of configuration file:
   "kafka.fetch.retries": 3,
   "transformer.class": "org.kafka.etl.transform.impl.DefaultTransform",
   "transformer.jar.path": "/transformer.jar",
+  "partition.key.calculator.class": "org.kafka.etl.kafka.impl.DefaultPartitionKeyCalculator",
+  "partition.key.calculator.jar.path": "/transformer.jar",
   "avro.json.schema.path": "/my-schema.json",
   "group.id": "etl",
   "topic.input": "IN",
@@ -47,6 +49,8 @@ Here is a sample of configuration file:
 * `topic.output`: (optional): output topic name (if present, it will enable the default `KafkaLoader` that will load the data in the output topic);
 * `loader.class`: (optional): the name of the loader class (for more details in the loader section);
 * `loader.jar.path`: (optional): the path of an external jar file that contain your loader class;
+* `partition.key.calculator.class`: (optional): the name of the partition key calculator class (for more details in the loader section);
+* `partition.key.calculator.jar.path`: (optional): the path of an external jar file that contain your partition key calculator class;
 * `group.id`: group id of the consumer hosting the input topic;
 * `poll.size`: number of records to are read and commit in one loop;
 * `consumer.record.size`: max size of a record that will be consumed in the input topic;
@@ -101,6 +105,22 @@ public interface ILoad {
 
 Then, replace the `topic.output` property in your config files by `loader.class` and `loader.jar.path`.
 
+## Implementation of another PartitionKeyCalculator
+
+This ETL provide a `DefaultPartitionKeyCalculator` implementation which set input topic partition key as partition key.
+
+But sometimes you want to set the partition key manually.
+
+In order to create a customized PartitionKeyCalculator, you need to include the `kafka-etl-core` JAR file into your dependencies and implement the following interface :
+
+```java
+package org.kafka.etl.load;
+
+public interface IPartitionKeyCalculator {
+    String generatePartitionKey(String originalKey, String message);
+}
+```
+You need to set the properties  `partition.key.calculator.class` and `partition.key.calculator.jar.path` in your config files by .
 # Running the project
 
 ## Build the project

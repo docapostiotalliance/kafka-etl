@@ -1,6 +1,6 @@
 package org.kafka.etl.kafka.impl;
 
-import org.kafka.etl.kafka.IPartitionKeyCalculator;
+import org.kafka.etl.load.IPartitionKeyCalculator;
 
 public class DefaultPartitionKeyCalculator implements IPartitionKeyCalculator {
   @Override
