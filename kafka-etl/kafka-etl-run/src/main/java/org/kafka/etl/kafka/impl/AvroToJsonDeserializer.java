@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -54,9 +55,7 @@ public class AvroToJsonDeserializer implements IDeserializer {
     try {
       LOGGER.debug(
           "[AvroToJsonDeserializer][deserialize] Initializing data reader from Avro schema!");
-      BinaryDecoder decoder = DecoderFactory.get()
-          .binaryDecoder(new ByteArrayInputStream(stripFirstOffsets(data)), null);
-      Object decodedValue = reader.read(null, decoder);
+      Object decodedValue = decodeData(data);
       String rtn = decodedValue.toString();
 
       if (JsonUtils.isValid(rtn)) {
@@ -94,6 +93,23 @@ public class AvroToJsonDeserializer implements IDeserializer {
           e.getMessage());
       throw new IllegalArgumentException(e);
     }
+  }
+
+  private Object decodeData(byte[] data) throws IOException {
+    try {
+      return defaultDataDecoding(stripFirstOffsets(data));
+    } catch (ArrayIndexOutOfBoundsException e) {
+      // Retry decoding data without strip/shift
+      LOGGER.debug("[AvroToJsonDeserializer][deserialize] retry decoding without data strip/shift");
+      return defaultDataDecoding(data);
+    }
+  }
+
+  private Object defaultDataDecoding(byte[] data) throws IOException {
+    BinaryDecoder
+        decoder =
+        DecoderFactory.get().binaryDecoder(new ByteArrayInputStream(data), null);
+    return reader.read(null, decoder);
   }
 
   private boolean isEmptyJson(String json) {
