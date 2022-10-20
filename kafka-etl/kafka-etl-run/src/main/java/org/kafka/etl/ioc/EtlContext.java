@@ -11,10 +11,11 @@ import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
+import org.apache.commons.lang3.StringUtils;
 import org.kafka.etl.kafka.IAdditionalConfig;
 import org.kafka.etl.kafka.IConsumerManager;
 import org.kafka.etl.kafka.IDeserializer;
-import org.kafka.etl.kafka.IPartitionKeyCalculator;
+import org.kafka.etl.load.IPartitionKeyCalculator;
 import org.kafka.etl.kafka.IProducerCallback;
 import org.kafka.etl.kafka.IProducerManager;
 import org.kafka.etl.kafka.ITopicStreamer;
@@ -66,11 +67,13 @@ public class EtlContext extends AbstractModule {
   private static final String KEY_AVRO_DATA_BYTES_START_OFFSET = "avro.data.bytes.start.offset";
   private static final String KEY_PRODUCER_RECORD_SIZE = "producer.record.size";
   private static final String KEY_JSON_AVRO_SCHEMA = "avro.json.schema.path";
+  private static final String KEY_PARTITION_KEY_CALCULATOR = "partition.key.calculator.class";
+  private static final String KEY_PARTITION_KEY_CALCULATOR_JAR =
+      "partition.key.calculator.jar.path";
 
   private static final String MSG_ERR_BAD_CLASS_TPL = "%s is not an instance of %s";
   private static final String MSG_ERR_INSTANCIATE_TRANSFORM_CLASS_TPL =
       "Error when trying to instanciate %s : e.type = %s, e.msg = %s";
-
 
   private static final String FILE_URL_PREFIX = "file:";
 
@@ -161,19 +164,7 @@ public class EtlContext extends AbstractModule {
     String jarPath = properties.getString(KEY_TRANSFORM_JAR);
 
     try {
-      Class<?> clazz = null;
-
-      if (isBlank(jarPath)) {
-        clazz = Class.forName(className);
-      } else {
-        String jarUrl = jarPath.startsWith(FILE_URL_PREFIX) ? jarPath : FILE_URL_PREFIX + jarPath;
-        URLClassLoader child =
-            new URLClassLoader(new URL[] {new URL(jarUrl)}, this.getClass().getClassLoader());
-        clazz = Class.forName(className, true, child);
-      }
-
-      Constructor<?> constructor = clazz.getConstructor();
-      Object instance = constructor.newInstance();
+      Object instance = getInstance(className, jarPath);
 
       if (!(instance instanceof ITransform)) {
         throw new IllegalArgumentException(
@@ -192,6 +183,57 @@ public class EtlContext extends AbstractModule {
           e.getClass().getSimpleName(),
           e.getMessage()));
     }
+  }
+
+  private IPartitionKeyCalculator getPartitionKeyCalculatorInstance() {
+    String className = properties.getString(KEY_PARTITION_KEY_CALCULATOR);
+    String jarPath = properties.getString(KEY_PARTITION_KEY_CALCULATOR_JAR);
+
+    if (StringUtils.isBlank(className) || StringUtils.isBlank(jarPath)) {
+      return new DefaultPartitionKeyCalculator();
+    }
+
+    try {
+      Object instance = getInstance(className, jarPath);
+
+      if (!(instance instanceof IPartitionKeyCalculator)) {
+        throw new IllegalArgumentException(String.format(MSG_ERR_BAD_CLASS_TPL, className));
+      }
+
+      return (IPartitionKeyCalculator) instance;
+    } catch (ClassNotFoundException
+        | NoSuchMethodException
+        | InstantiationException
+        | IllegalAccessException
+        | InvocationTargetException
+        | MalformedURLException e) {
+      throw new IllegalArgumentException(String.format(MSG_ERR_INSTANCIATE_TRANSFORM_CLASS_TPL,
+          className,
+          e.getClass().getSimpleName(),
+          e.getMessage()));
+    }
+  }
+
+  private Object getInstance(String className, String jarPath) throws ClassNotFoundException,
+      MalformedURLException,
+      NoSuchMethodException,
+      InstantiationException,
+      IllegalAccessException,
+      InvocationTargetException {
+
+    Class<?> clazz = null;
+
+    if (isBlank(jarPath)) {
+      clazz = Class.forName(className);
+    } else {
+      String jarUrl = jarPath.startsWith(FILE_URL_PREFIX) ? jarPath : FILE_URL_PREFIX + jarPath;
+      URLClassLoader child =
+          new URLClassLoader(new URL[] {new URL(jarUrl)}, this.getClass().getClassLoader());
+      clazz = Class.forName(className, true, child);
+    }
+
+    Constructor<?> constructor = clazz.getConstructor();
+    return constructor.newInstance();
   }
 
   private Optional<String> searchAvroSchema() {
@@ -250,7 +292,7 @@ public class EtlContext extends AbstractModule {
                         : new DefaultDeserializer()));
     bind(ITransform.class).toInstance(createTransformer());
     bind(IProducerCallback.class).to(DefaultProducerCallback.class);
-    bind(IPartitionKeyCalculator.class).to(DefaultPartitionKeyCalculator.class);
+    bind(IPartitionKeyCalculator.class).toInstance(getPartitionKeyCalculatorInstance());
 
     String loaderClassName = properties.getString(KEY_LOADER);
     String loaderJarPath = properties.getString(KEY_LOADER_JAR);
